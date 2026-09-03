@@ -1,9 +1,16 @@
 import { test, expect, Page } from '@playwright/test'
+import { getPayload } from 'payload'
+
+import config from '@/payload.config'
+import { importJuteRope } from '@/importers/juteRope'
 
 test.describe('Frontend', () => {
   let page: Page
 
   test.beforeAll(async ({ browser }, testInfo) => {
+    const payload = await getPayload({ config })
+    await importJuteRope(payload)
+
     const context = await browser.newContext()
     page = await context.newPage()
   })
@@ -13,5 +20,17 @@ test.describe('Frontend', () => {
     await expect(page).toHaveTitle(/Payload Website Template/)
     const heading = page.locator('h1').first()
     await expect(heading).toHaveText('Payload Website Template')
+  })
+
+  test('lets buyers discover a published Product and read its detail page', async ({ page }) => {
+    await page.goto('http://localhost:3000/products')
+
+    await expect(page.getByRole('heading', { name: 'Jute Rope' })).toBeVisible()
+    await page.getByRole('link', { name: 'View Jute Rope' }).click()
+
+    await expect(page).toHaveURL('http://localhost:3000/products/jute-rope')
+    await expect(page.getByRole('heading', { name: 'Jute Rope' })).toBeVisible()
+    await expect(page.getByText('Packing & Trade')).toBeVisible()
+    await expect(page.getByText('LC at Sight, T/T, CAD')).toBeVisible()
   })
 })

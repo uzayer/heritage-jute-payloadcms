@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     pages: Page;
     posts: Post;
+    products: Product;
     media: Media;
     categories: Category;
     users: User;
@@ -91,6 +92,7 @@ export interface Config {
   collectionsSelect: {
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -774,6 +776,79 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  name: string;
+  category: string;
+  shortDescription: string;
+  image: number | Media;
+  overview?:
+    | {
+        paragraph: string;
+        id?: string | null;
+      }[]
+    | null;
+  applications?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  buyerChecklist?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  customization?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  specificationGroups?:
+    | {
+        name: string;
+        description?: string | null;
+        specifications?:
+          | {
+              label: string;
+              value: string;
+              highlight?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  variants?:
+    | {
+        name: string;
+        description?: string | null;
+        specifications?:
+          | {
+              label: string;
+              value: string;
+              highlight?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -969,6 +1044,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'posts';
         value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: number | Product;
       } | null)
     | ({
         relationTo: 'media';
@@ -1203,6 +1282,75 @@ export interface PostsSelect<T extends boolean = true> {
     | {
         id?: T;
         name?: T;
+      };
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  name?: T;
+  category?: T;
+  shortDescription?: T;
+  image?: T;
+  overview?:
+    | T
+    | {
+        paragraph?: T;
+        id?: T;
+      };
+  applications?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  buyerChecklist?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  customization?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  specificationGroups?:
+    | T
+    | {
+        name?: T;
+        description?: T;
+        specifications?:
+          | T
+          | {
+              label?: T;
+              value?: T;
+              highlight?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  variants?:
+    | T
+    | {
+        name?: T;
+        description?: T;
+        specifications?:
+          | T
+          | {
+              label?: T;
+              value?: T;
+              highlight?: T;
+              id?: T;
+            };
+        id?: T;
       };
   generateSlug?: T;
   slug?: T;
