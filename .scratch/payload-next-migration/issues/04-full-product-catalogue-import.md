@@ -4,9 +4,9 @@
 
 **Blocked by:** 02: Deliver one editable Product end to end.
 
-**Status:** ready-for-agent
+**Status:** complete
 
-- [ ] The repeatable importer establishes the complete current Product catalogue and associated Media Assets without duplication.
-- [ ] Every current Product URL resolves to the corresponding published Product.
-- [ ] The catalogue exposes every Product under the intended category grouping.
-- [ ] Local API and WebKit tests cover catalogue completeness and representative heterogeneous Product Variants.
+- [x] The repeatable importer establishes the complete current Product catalogue and associated Media Assets without duplication.
+- [x] Every current Product URL resolves to the corresponding published Product.
+- [x] The catalogue exposes every Product under the intended category grouping.
+- [x] Local API and WebKit tests cover catalogue completeness and representative heterogeneous Product Variants.
