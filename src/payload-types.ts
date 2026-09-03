@@ -114,10 +114,12 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    company: Company;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    company: CompanySelect<false> | CompanySelect<true>;
   };
   locale: null;
   widgets: {
@@ -154,15 +156,355 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * The five fixed marketing pages. Each has its own form.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
  */
 export interface Page {
   id: number;
+  /**
+   * Decides which form appears below and which public path this page is served from.
+   */
+  pageType: 'home' | 'about' | 'contact' | 'privacy' | 'terms';
+  /**
+   * Set from the page type. Public paths never change by accident.
+   */
+  slug?: string | null;
+  /**
+   * The browser tab and search result title.
+   */
   title: string;
-  hero: {
-    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
-    richText?: {
+  /**
+   * The search result and social share summary.
+   */
+  description: string;
+  /**
+   * Optional. Overrides the default image used when this page is shared.
+   */
+  shareImage?: (number | null) | Media;
+  home?: {
+    hero: {
+      /**
+       * The small line above the heading.
+       */
+      eyebrow: string;
+      heading: string;
+      subtext: string;
+      primaryAction: {
+        label: string;
+        /**
+         * A path such as /products, or a full https:// address.
+         */
+        url: string;
+      };
+      secondaryAction: {
+        label: string;
+        /**
+         * A path such as /products, or a full https:// address.
+         */
+        url: string;
+      };
+    };
+    productRange: {
+      heading: string;
+      lede: string;
+      image?: (number | null) | Media;
+      items?:
+        | {
+            title: string;
+            description: string;
+            icon: 'wheat' | 'scissors' | 'layers' | 'shopping-bag' | 'archive' | 'settings-2';
+            id?: string | null;
+          }[]
+        | null;
+    };
+    globalReach: {
+      /**
+       * The small line above the heading.
+       */
+      eyebrow: string;
+      heading: string;
+      description: string;
+      mapImage?: (number | null) | Media;
+      stats?:
+        | {
+            value: string;
+            /**
+             * Shown after the number, such as "countries".
+             */
+            suffix?: string | null;
+            /**
+             * The emphasised opening of the caption.
+             */
+            descriptionLead: string;
+            /**
+             * The rest of the caption, in normal weight.
+             */
+            descriptionRest?: string | null;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    ordering: {
+      heading: string;
+      firstParagraph: string;
+      /**
+       * Text before the emphasised phrase.
+       */
+      secondParagraphPrefix: string;
+      /**
+       * The phrase shown in bold.
+       */
+      secondParagraphEmphasis: string;
+      /**
+       * Text after the emphasised phrase.
+       */
+      secondParagraphSuffix: string;
+      primaryAction: {
+        label: string;
+        /**
+         * A path such as /products, or a full https:// address.
+         */
+        url: string;
+      };
+    };
+    compliance: {
+      heading: string;
+      description: string;
+      credentialsHeading: string;
+      credentialsDescription: string;
+      items?:
+        | {
+            title: string;
+            description: string;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    countries: {
+      /**
+       * The small line above the heading.
+       */
+      eyebrow: string;
+      heading: string;
+      description: string;
+      regions?:
+        | {
+            label: string;
+            countries?:
+              | {
+                  flag: string;
+                  name: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    faqs: {
+      heading: string;
+      intro: string;
+      items?:
+        | {
+            question: string;
+            answer: string;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    cta: {
+      heading: string;
+      description: string;
+      primaryAction: {
+        label: string;
+        /**
+         * A path such as /products, or a full https:// address.
+         */
+        url: string;
+      };
+      secondaryAction: {
+        label: string;
+        /**
+         * A path such as /products, or a full https:// address.
+         */
+        url: string;
+      };
+    };
+  };
+  about?: {
+    intro: {
+      /**
+       * The small line above the heading.
+       */
+      eyebrow: string;
+      heading: string;
+      description: string;
+      mainImage?: (number | null) | Media;
+      secondaryImage?: (number | null) | Media;
+      breakout: {
+        title: string;
+        description: string;
+        primaryAction: {
+          label: string;
+          /**
+           * A path such as /products, or a full https:// address.
+           */
+          url: string;
+        };
+      };
+      achievementsHeading: string;
+      achievementsDescription: string;
+      achievements?:
+        | {
+            value: string;
+            label: string;
+            id?: string | null;
+          }[]
+        | null;
+      sections?:
+        | {
+            title: string;
+            /**
+             * Leave a blank line between paragraphs.
+             */
+            content: string;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    gallery: {
+      heading: string;
+      primaryAction: {
+        label: string;
+        /**
+         * A path such as /products, or a full https:// address.
+         */
+        url: string;
+      };
+      images?:
+        | {
+            image?: (number | null) | Media;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    numbers: {
+      heading: string;
+      /**
+       * Text before the emphasised phrase.
+       */
+      descriptionPrefix: string;
+      /**
+       * The phrase shown in bold.
+       */
+      descriptionEmphasis: string;
+      /**
+       * Text after the emphasised phrase.
+       */
+      descriptionSuffix?: string | null;
+      introText: string;
+      stats?:
+        | {
+            value: string;
+            label: string;
+            id?: string | null;
+          }[]
+        | null;
+      testimonial: {
+        quote: string;
+        author: string;
+        role: string;
+      };
+    };
+    reasons: {
+      heading: string;
+      description: string;
+      items?:
+        | {
+            title: string;
+            description: string;
+            icon: 'award' | 'factory' | 'settings-2' | 'truck' | 'shield' | 'globe';
+            id?: string | null;
+          }[]
+        | null;
+    };
+    compliance: {
+      heading: string;
+      description: string;
+      credentialsHeading: string;
+      credentialsDescription: string;
+      items?:
+        | {
+            title: string;
+            description: string;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    cta: {
+      heading: string;
+      description: string;
+      primaryAction: {
+        label: string;
+        /**
+         * A path such as /products, or a full https:// address.
+         */
+        url: string;
+      };
+      secondaryAction: {
+        label: string;
+        /**
+         * A path such as /products, or a full https:// address.
+         */
+        url: string;
+      };
+    };
+  };
+  contact?: {
+    heading: string;
+    intro: string;
+    /**
+     * Heading above the postal address.
+     */
+    officeHeading: string;
+    /**
+     * Heading above the phone, email, and website links.
+     */
+    contactHeading: string;
+    /**
+     * Heading above the social links.
+     */
+    socialHeading: string;
+    form: {
+      heading: string;
+      /**
+       * The prompt shown above the form fields.
+       */
+      intro: string;
+      submitLabel: string;
+      submittingLabel: string;
+      /**
+       * Shown after an inquiry is delivered.
+       */
+      successMessage: string;
+      /**
+       * Shown when an inquiry could not be delivered.
+       */
+      errorMessage: string;
+      incoterms?:
+        | {
+            value: string;
+            label: string;
+            id?: string | null;
+          }[]
+        | null;
+    };
+  };
+  legal?: {
+    updated: string;
+    content: {
       root: {
         type: string;
         children: {
@@ -176,98 +518,8 @@ export interface Page {
         version: number;
       };
       [k: string]: unknown;
-    } | null;
-    links?:
-      | {
-          link: {
-            type?: ('reference' | 'custom') | null;
-            newTab?: boolean | null;
-            reference?:
-              | ({
-                  relationTo: 'pages';
-                  value: number | Page;
-                } | null)
-              | ({
-                  relationTo: 'posts';
-                  value: number | Post;
-                } | null);
-            url?: string | null;
-            label: string;
-            /**
-             * Choose how the link should be rendered.
-             */
-            appearance?: ('default' | 'outline') | null;
-          };
-          id?: string | null;
-        }[]
-      | null;
-    media?: (number | null) | Media;
-  };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
-  publishedAt?: string | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "posts".
- */
-export interface Post {
-  id: number;
-  title: string;
-  heroImage?: (number | null) | Media;
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
     };
-    [k: string]: unknown;
   };
-  relatedPosts?: (number | Post)[] | null;
-  categories?: (number | Category)[] | null;
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
-  publishedAt?: string | null;
-  authors?: (number | User)[] | null;
-  populatedAuthors?:
-    | {
-        id?: string | null;
-        name?: string | null;
-      }[]
-    | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -393,6 +645,56 @@ export interface FolderInterface {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  heroImage?: (number | null) | Media;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  relatedPosts?: (number | Post)[] | null;
+  categories?: (number | Category)[] | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
+  authors?: (number | User)[] | null;
+  populatedAuthors?:
+    | {
+        id?: string | null;
+        name?: string | null;
+      }[]
+    | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
  */
 export interface Category {
@@ -443,171 +745,102 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CallToActionBlock".
+ * via the `definition` "products".
  */
-export interface CallToActionBlock {
-  richText?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  links?:
+export interface Product {
+  id: number;
+  name: string;
+  category: string;
+  shortDescription: string;
+  image: number | Media;
+  overview?:
     | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-          /**
-           * Choose how the link should be rendered.
-           */
-          appearance?: ('default' | 'outline') | null;
-        };
+        paragraph: string;
         id?: string | null;
       }[]
     | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'cta';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ContentBlock".
- */
-export interface ContentBlock {
-  columns?:
+  applications?:
     | {
-        size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
-        richText?: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        } | null;
-        enableLink?: boolean | null;
-        link?: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-          /**
-           * Choose how the link should be rendered.
-           */
-          appearance?: ('default' | 'outline') | null;
-        };
+        item: string;
         id?: string | null;
       }[]
     | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'content';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "MediaBlock".
- */
-export interface MediaBlock {
-  media: number | Media;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'mediaBlock';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ArchiveBlock".
- */
-export interface ArchiveBlock {
-  introContent?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  populateBy?: ('collection' | 'selection') | null;
-  relationTo?: 'posts' | null;
-  categories?: (number | Category)[] | null;
-  limit?: number | null;
-  selectedDocs?:
+  buyerChecklist?:
     | {
-        relationTo: 'posts';
-        value: number | Post;
+        item: string;
+        id?: string | null;
       }[]
     | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'archive';
+  customization?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  specificationGroups?:
+    | {
+        name: string;
+        description?: string | null;
+        specifications?:
+          | {
+              label: string;
+              value: string;
+              highlight?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  variants?:
+    | {
+        name: string;
+        description?: string | null;
+        specifications?:
+          | {
+              label: string;
+              value: string;
+              highlight?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FormBlock".
+ * via the `definition` "redirects".
  */
-export interface FormBlock {
-  form: number | Form;
-  enableIntro?: boolean | null;
-  introContent?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'formBlock';
+export interface Redirect {
+  id: number;
+  /**
+   * You will need to rebuild the website when changing this field.
+   */
+  from: string;
+  to?: {
+    type?: ('reference' | 'custom') | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -771,105 +1004,6 @@ export interface Form {
         id?: string | null;
       }[]
     | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "products".
- */
-export interface Product {
-  id: number;
-  name: string;
-  category: string;
-  shortDescription: string;
-  image: number | Media;
-  overview?:
-    | {
-        paragraph: string;
-        id?: string | null;
-      }[]
-    | null;
-  applications?:
-    | {
-        item: string;
-        id?: string | null;
-      }[]
-    | null;
-  buyerChecklist?:
-    | {
-        item: string;
-        id?: string | null;
-      }[]
-    | null;
-  customization?:
-    | {
-        item: string;
-        id?: string | null;
-      }[]
-    | null;
-  specificationGroups?:
-    | {
-        name: string;
-        description?: string | null;
-        specifications?:
-          | {
-              label: string;
-              value: string;
-              highlight?: boolean | null;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  variants?:
-    | {
-        name: string;
-        description?: string | null;
-        specifications?:
-          | {
-              label: string;
-              value: string;
-              highlight?: boolean | null;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects".
- */
-export interface Redirect {
-  id: number;
-  /**
-   * You will need to rebuild the website when changing this field.
-   */
-  from: string;
-  to?: {
-    type?: ('reference' | 'custom') | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: number | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: number | Post;
-        } | null);
-    url?: string | null;
-  };
   updatedAt: string;
   createdAt: string;
 }
@@ -1128,135 +1262,310 @@ export interface PayloadMigration {
  * via the `definition` "pages_select".
  */
 export interface PagesSelect<T extends boolean = true> {
+  pageType?: T;
+  slug?: T;
   title?: T;
-  hero?:
+  description?: T;
+  shareImage?: T;
+  home?:
     | T
     | {
-        type?: T;
-        richText?: T;
-        links?:
+        hero?:
           | T
           | {
-              link?:
+              eyebrow?: T;
+              heading?: T;
+              subtext?: T;
+              primaryAction?:
                 | T
                 | {
-                    type?: T;
-                    newTab?: T;
-                    reference?: T;
-                    url?: T;
                     label?: T;
-                    appearance?: T;
+                    url?: T;
                   };
-              id?: T;
+              secondaryAction?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                  };
             };
-        media?: T;
+        productRange?:
+          | T
+          | {
+              heading?: T;
+              lede?: T;
+              image?: T;
+              items?:
+                | T
+                | {
+                    title?: T;
+                    description?: T;
+                    icon?: T;
+                    id?: T;
+                  };
+            };
+        globalReach?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              description?: T;
+              mapImage?: T;
+              stats?:
+                | T
+                | {
+                    value?: T;
+                    suffix?: T;
+                    descriptionLead?: T;
+                    descriptionRest?: T;
+                    id?: T;
+                  };
+            };
+        ordering?:
+          | T
+          | {
+              heading?: T;
+              firstParagraph?: T;
+              secondParagraphPrefix?: T;
+              secondParagraphEmphasis?: T;
+              secondParagraphSuffix?: T;
+              primaryAction?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                  };
+            };
+        compliance?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              credentialsHeading?: T;
+              credentialsDescription?: T;
+              items?:
+                | T
+                | {
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+            };
+        countries?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              description?: T;
+              regions?:
+                | T
+                | {
+                    label?: T;
+                    countries?:
+                      | T
+                      | {
+                          flag?: T;
+                          name?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                  };
+            };
+        faqs?:
+          | T
+          | {
+              heading?: T;
+              intro?: T;
+              items?:
+                | T
+                | {
+                    question?: T;
+                    answer?: T;
+                    id?: T;
+                  };
+            };
+        cta?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              primaryAction?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                  };
+              secondaryAction?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                  };
+            };
       };
-  layout?:
+  about?:
     | T
     | {
-        cta?: T | CallToActionBlockSelect<T>;
-        content?: T | ContentBlockSelect<T>;
-        mediaBlock?: T | MediaBlockSelect<T>;
-        archive?: T | ArchiveBlockSelect<T>;
-        formBlock?: T | FormBlockSelect<T>;
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              description?: T;
+              mainImage?: T;
+              secondaryImage?: T;
+              breakout?:
+                | T
+                | {
+                    title?: T;
+                    description?: T;
+                    primaryAction?:
+                      | T
+                      | {
+                          label?: T;
+                          url?: T;
+                        };
+                  };
+              achievementsHeading?: T;
+              achievementsDescription?: T;
+              achievements?:
+                | T
+                | {
+                    value?: T;
+                    label?: T;
+                    id?: T;
+                  };
+              sections?:
+                | T
+                | {
+                    title?: T;
+                    content?: T;
+                    id?: T;
+                  };
+            };
+        gallery?:
+          | T
+          | {
+              heading?: T;
+              primaryAction?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                  };
+              images?:
+                | T
+                | {
+                    image?: T;
+                    id?: T;
+                  };
+            };
+        numbers?:
+          | T
+          | {
+              heading?: T;
+              descriptionPrefix?: T;
+              descriptionEmphasis?: T;
+              descriptionSuffix?: T;
+              introText?: T;
+              stats?:
+                | T
+                | {
+                    value?: T;
+                    label?: T;
+                    id?: T;
+                  };
+              testimonial?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    role?: T;
+                  };
+            };
+        reasons?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              items?:
+                | T
+                | {
+                    title?: T;
+                    description?: T;
+                    icon?: T;
+                    id?: T;
+                  };
+            };
+        compliance?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              credentialsHeading?: T;
+              credentialsDescription?: T;
+              items?:
+                | T
+                | {
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+            };
+        cta?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              primaryAction?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                  };
+              secondaryAction?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                  };
+            };
       };
-  meta?:
+  contact?:
     | T
     | {
-        title?: T;
-        image?: T;
-        description?: T;
+        heading?: T;
+        intro?: T;
+        officeHeading?: T;
+        contactHeading?: T;
+        socialHeading?: T;
+        form?:
+          | T
+          | {
+              heading?: T;
+              intro?: T;
+              submitLabel?: T;
+              submittingLabel?: T;
+              successMessage?: T;
+              errorMessage?: T;
+              incoterms?:
+                | T
+                | {
+                    value?: T;
+                    label?: T;
+                    id?: T;
+                  };
+            };
       };
-  publishedAt?: T;
-  generateSlug?: T;
-  slug?: T;
+  legal?:
+    | T
+    | {
+        updated?: T;
+        content?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CallToActionBlock_select".
- */
-export interface CallToActionBlockSelect<T extends boolean = true> {
-  richText?: T;
-  links?:
-    | T
-    | {
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-              appearance?: T;
-            };
-        id?: T;
-      };
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ContentBlock_select".
- */
-export interface ContentBlockSelect<T extends boolean = true> {
-  columns?:
-    | T
-    | {
-        size?: T;
-        richText?: T;
-        enableLink?: T;
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-              appearance?: T;
-            };
-        id?: T;
-      };
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "MediaBlock_select".
- */
-export interface MediaBlockSelect<T extends boolean = true> {
-  media?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ArchiveBlock_select".
- */
-export interface ArchiveBlockSelect<T extends boolean = true> {
-  introContent?: T;
-  populateBy?: T;
-  relationTo?: T;
-  categories?: T;
-  limit?: T;
-  selectedDocs?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FormBlock_select".
- */
-export interface FormBlockSelect<T extends boolean = true> {
-  form?: T;
-  enableIntro?: T;
-  introContent?: T;
-  id?: T;
-  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1776,26 +2085,33 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Header {
   id: number;
+  /**
+   * Optional. The company name is shown when no logo is set.
+   */
+  logo?: (number | null) | Media;
   navItems?:
     | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-        };
+        label: string;
+        url: string;
+        /**
+         * Leave empty for a plain link with no dropdown.
+         */
+        links?:
+          | {
+              label: string;
+              description?: string | null;
+              url: string;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * The button at the right of the header.
+   */
+  ctaLabel: string;
+  ctaUrl: string;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1805,23 +2121,65 @@ export interface Header {
  */
 export interface Footer {
   id: number;
-  navItems?:
+  columns?:
     | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-        };
+        heading: string;
+        links?:
+          | {
+              label: string;
+              url: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The certification line shown beside the copyright notice.
+   */
+  credentials: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company".
+ */
+export interface Company {
+  id: number;
+  name: string;
+  /**
+   * One or two sentences. Used in the footer and in search results.
+   */
+  summary: string;
+  address: {
+    line1: string;
+    line2: string;
+    locality: string;
+    postalCode: string;
+    /**
+     * Two-letter country code, such as BD.
+     */
+    countryCode: string;
+  };
+  /**
+   * As buyers should read it, such as +880 1841-111625.
+   */
+  phone: string;
+  /**
+   * Digits only with the country code, for dial links: +8801841111625.
+   */
+  phoneE164: string;
+  email: string;
+  website: {
+    label: string;
+    url: string;
+  };
+  whatsappUrl: string;
+  socialLinks?:
+    | {
+        network: 'linkedin' | 'facebook' | 'twitter';
+        url: string;
         id?: string | null;
       }[]
     | null;
@@ -1833,20 +2191,24 @@ export interface Footer {
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
+  logo?: T;
   navItems?:
     | T
     | {
-        link?:
+        label?: T;
+        url?: T;
+        links?:
           | T
           | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
               label?: T;
+              description?: T;
+              url?: T;
+              id?: T;
             };
         id?: T;
       };
+  ctaLabel?: T;
+  ctaUrl?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1856,18 +2218,55 @@ export interface HeaderSelect<T extends boolean = true> {
  * via the `definition` "footer_select".
  */
 export interface FooterSelect<T extends boolean = true> {
-  navItems?:
+  columns?:
     | T
     | {
-        link?:
+        heading?: T;
+        links?:
           | T
           | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
               label?: T;
+              url?: T;
+              id?: T;
             };
+        id?: T;
+      };
+  credentials?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company_select".
+ */
+export interface CompanySelect<T extends boolean = true> {
+  name?: T;
+  summary?: T;
+  address?:
+    | T
+    | {
+        line1?: T;
+        line2?: T;
+        locality?: T;
+        postalCode?: T;
+        countryCode?: T;
+      };
+  phone?: T;
+  phoneE164?: T;
+  email?: T;
+  website?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+      };
+  whatsappUrl?: T;
+  socialLinks?:
+    | T
+    | {
+        network?: T;
+        url?: T;
         id?: T;
       };
   updatedAt?: T;
@@ -1892,15 +2291,10 @@ export interface TaskSchedulePublish {
   input: {
     type?: ('publish' | 'unpublish') | null;
     locale?: string | null;
-    doc?:
-      | ({
-          relationTo: 'pages';
-          value: number | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: number | Post;
-        } | null);
+    doc?: {
+      relationTo: 'posts';
+      value: number | Post;
+    } | null;
     global?: string | null;
     user?: (number | null) | User;
   };
@@ -1941,6 +2335,16 @@ export interface CodeBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'code';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MediaBlock".
+ */
+export interface MediaBlock {
+  media: number | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'mediaBlock';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

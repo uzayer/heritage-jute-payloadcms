@@ -1,32 +1,42 @@
 import type { GlobalConfig } from 'payload'
 
-import { link } from '@/fields/link'
+import { authenticated } from '@/access/authenticated'
+
 import { revalidateFooter } from './hooks/revalidateFooter'
 
+/**
+ * Shared Site Content: the footer every public page renders. The company address,
+ * phone, and email come from Company details rather than being repeated here.
+ */
 export const Footer: GlobalConfig = {
   slug: 'footer',
-  access: {
-    read: () => true,
-  },
+  label: 'Footer',
+  access: { read: () => true, update: authenticated },
+  admin: { group: 'Site content' },
   fields: [
     {
-      name: 'navItems',
+      name: 'columns',
       type: 'array',
+      labels: { singular: 'Footer column', plural: 'Footer columns' },
       fields: [
-        link({
-          appearances: false,
-        }),
-      ],
-      maxRows: 6,
-      admin: {
-        initCollapsed: true,
-        components: {
-          RowLabel: '@/Footer/RowLabel#RowLabel',
+        { name: 'heading', type: 'text', required: true },
+        {
+          name: 'links',
+          type: 'array',
+          labels: { singular: 'Link', plural: 'Links' },
+          fields: [
+            { name: 'label', type: 'text', required: true },
+            { name: 'url', type: 'text', required: true },
+          ],
         },
-      },
+      ],
+    },
+    {
+      name: 'credentials',
+      type: 'text',
+      required: true,
+      admin: { description: 'The certification line shown beside the copyright notice.' },
     },
   ],
-  hooks: {
-    afterChange: [revalidateFooter],
-  },
+  hooks: { afterChange: [revalidateFooter] },
 }

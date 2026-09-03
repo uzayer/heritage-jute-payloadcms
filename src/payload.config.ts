@@ -13,6 +13,7 @@ import { Products } from './collections/Products'
 import { Users } from './collections/Users/index'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
+import { Company } from './Company/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -87,7 +88,7 @@ export default buildConfig({
   }),
   collections: [Pages, Posts, Products, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Header, Footer],
+  globals: [Header, Footer, Company],
   plugins: [
     ...plugins,
     s3Storage({

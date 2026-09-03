@@ -1,10 +1,15 @@
 import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 
-import type { File, Payload } from 'payload'
-import YAML from 'yaml'
+import type { Payload } from 'payload'
 
-const defaultSourceDirectory = path.resolve(process.cwd(), '../heritage-jute')
+import {
+  type ImageLoader,
+  parseContentFile,
+  readImageFile,
+  resolveSourceDirectory,
+  upsertMediaAsset,
+} from './source'
 
 type Specification = {
   highlight?: boolean
@@ -34,16 +39,8 @@ type ProductSource = {
 }
 
 type ImportOptions = {
-  loadImage?: (source: ProductSource, sourceDirectory: string) => Promise<File>
+  loadImage?: ImageLoader
   sourceDirectory?: string
-}
-
-const parseProduct = (raw: string): ProductSource => {
-  const frontmatter = raw.match(/^---\n([\s\S]*?)\n---/)
-
-  if (!frontmatter) throw new Error('Product source is missing YAML frontmatter.')
-
-  return YAML.parse(frontmatter[1]) as ProductSource
 }
 
 const toSpecifications = (specifications: Specification[]) =>
@@ -76,23 +73,10 @@ const toProductData = (source: ProductSource, image: number, slug: string) => ({
   })),
 })
 
-const getImageFile = async (source: ProductSource, sourceDirectory: string): Promise<File> => {
-  const imagePath = path.join(sourceDirectory, 'public', source.image.src.replace(/^\//, ''))
-  const data = Buffer.from(await readFile(imagePath))
-
-  return {
-    data,
-    mimetype: `image/${path.extname(imagePath).slice(1)}`,
-    name: path.basename(imagePath),
-    size: data.byteLength,
-  }
-}
-
 export async function importProductCatalogue(payload: Payload, options: ImportOptions = {}) {
-  const sourceDirectory =
-    options.sourceDirectory ?? process.env.HERITAGE_JUTE_SOURCE_DIR ?? defaultSourceDirectory
+  const sourceDirectory = resolveSourceDirectory(options.sourceDirectory)
   const productDirectory = path.join(sourceDirectory, 'src/content/products')
-  const loadImage = options.loadImage ?? getImageFile
+  const loadImage = options.loadImage ?? readImageFile
   const filenames = (await readdir(productDirectory))
     .filter((filename) => filename.endsWith('.md'))
     .sort()
@@ -101,23 +85,14 @@ export async function importProductCatalogue(payload: Payload, options: ImportOp
 
   for (const filename of filenames) {
     const slug = path.basename(filename, '.md')
-    const source = parseProduct(await readFile(path.join(productDirectory, filename), 'utf8'))
-    const imageFile = await loadImage(source, sourceDirectory)
-    const existingMedia = await payload.find({
-      collection: 'media',
-      limit: 1,
-      pagination: false,
-      where: { filename: { equals: imageFile.name } },
+    const { data: source } = parseContentFile<ProductSource>(
+      await readFile(path.join(productDirectory, filename), 'utf8'),
+    )
+    const media = await upsertMediaAsset(payload, {
+      alt: source.image.alt,
+      file: await loadImage(sourceDirectory, source.image.src),
     })
-    const media =
-      existingMedia.docs[0] ??
-      (await payload.create({
-        collection: 'media',
-        context: { disableRevalidate: true },
-        data: { alt: source.image.alt },
-        file: imageFile,
-      }))
-    const data = toProductData(source, media.id, slug)
+    const data = toProductData(source, media, slug)
     const existingProduct = await payload.find({
       collection: 'products',
       limit: 1,

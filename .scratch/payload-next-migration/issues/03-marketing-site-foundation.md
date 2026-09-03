@@ -4,9 +4,9 @@
 
 **Blocked by:** 01: Establish the Vercel, Turso, and R2 Payload foundation.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] The Site Administrator can edit the Header, Footer, company information, and fixed Home/About content without a page builder.
-- [ ] Home and About reproduce the current buyer-facing structure, responsive presentation, and brand treatment.
-- [ ] Shared navigation and footer content render consistently across the delivered public pages.
-- [ ] WebKit tests verify the delivered desktop and mobile public experience.
+- [x] The Site Administrator can edit the Header, Footer, company information, and fixed Home/About content without a page builder.
+- [x] Home and About reproduce the current buyer-facing structure, responsive presentation, and brand treatment.
+- [x] Shared navigation and footer content render consistently across the delivered public pages.
+- [x] WebKit tests verify the delivered desktop and mobile public experience.
