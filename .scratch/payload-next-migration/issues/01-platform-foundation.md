@@ -4,8 +4,8 @@
 
 **Blocked by:** None (can start immediately).
 
-**Status:** ready-for-agent
+**Status:** complete
 
-- [ ] The application uses a supported managed SQLite connection and S3-compatible Media Asset storage rather than Cloudflare Worker-only bindings.
-- [ ] Development/preview and production configuration are distinct and documented without committing secrets.
-- [ ] The application and the initial WebKit test project run successfully against the configured development environment.
+- [x] The application uses a supported managed SQLite connection and S3-compatible Media Asset storage rather than Cloudflare Worker-only bindings.
+- [x] Development/preview and production configuration are distinct and documented without committing secrets.
+- [x] The application and the initial WebKit test project run successfully against the configured development environment.

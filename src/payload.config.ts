@@ -1,4 +1,5 @@
-import { sqliteD1Adapter } from '@payloadcms/db-d1-sqlite'
+import { sqliteAdapter } from '@payloadcms/db-sqlite'
+import { s3Storage } from '@payloadcms/storage-s3'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -8,16 +9,34 @@ import { Categories } from './collections/Categories'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
-import { Users } from './collections/Users'
+import { Users } from './collections/Users/index'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
-import migrations from './db/migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+
+const isVercelDeployment = Boolean(process.env.VERCEL)
+const databaseURL = process.env.DATABASE_URL ?? 'file:./heritage-jute-development.db'
+const r2Environment = {
+  accessKeyId: process.env.R2_ACCESS_KEY_ID,
+  bucket: process.env.R2_BUCKET,
+  endpoint: process.env.R2_ENDPOINT,
+  publicURL: process.env.R2_PUBLIC_URL,
+  secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+}
+const hasR2Configuration = Object.values(r2Environment).every(Boolean)
+
+if (isVercelDeployment && !process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is required for Vercel deployments.')
+}
+
+if (isVercelDeployment && !hasR2Configuration) {
+  throw new Error('All R2 environment variables are required for Vercel deployments.')
+}
 
 export default buildConfig({
   admin: {
@@ -58,13 +77,41 @@ export default buildConfig({
   },
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
-  db: sqliteD1Adapter({
-    binding: cloudflare.env.D1,
+  db: sqliteAdapter({
+    client: {
+      url: databaseURL,
+      authToken: process.env.DATABASE_AUTH_TOKEN,
+    },
+    transactionOptions: {},
   }),
   collections: [Pages, Posts, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
-  plugins,
+  plugins: [
+    ...plugins,
+    s3Storage({
+      enabled: hasR2Configuration,
+      collections: {
+        [Media.slug]: {
+          disablePayloadAccessControl: true,
+          generateFileURL: ({ filename, prefix }: { filename: string; prefix?: string }) => {
+            const key = prefix ? `${prefix}/${filename}` : filename
+            return `${r2Environment.publicURL}/${key}`
+          },
+        },
+      },
+      bucket: r2Environment.bucket ?? '',
+      config: {
+        credentials: {
+          accessKeyId: r2Environment.accessKeyId ?? '',
+          secretAccessKey: r2Environment.secretAccessKey ?? '',
+        },
+        endpoint: r2Environment.endpoint,
+        forcePathStyle: true,
+        region: 'auto',
+      },
+    }),
+  ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {
