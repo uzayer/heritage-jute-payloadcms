@@ -33,11 +33,12 @@ const icons: Record<string, LucideIcon> = {
   wheat: Wheat,
 }
 
-export const SectionIcon: React.FC<{ className?: string; name: string }> = ({
+export const SectionIcon: React.FC<{ className?: string; name: string; strokeWidth?: number }> = ({
   className,
   name,
+  strokeWidth,
 }) => {
   const Icon = icons[name]
 
-  return Icon ? <Icon aria-hidden className={className} /> : null
+  return Icon ? <Icon aria-hidden className={className} strokeWidth={strokeWidth} /> : null
 }

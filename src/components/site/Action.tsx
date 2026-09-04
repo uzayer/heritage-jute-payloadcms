@@ -1,18 +1,10 @@
 import Link from 'next/link'
 import React from 'react'
 
+import { buttonVariants, type ButtonProps } from '@/components/ui/button'
 import { cn } from '@/utilities/ui'
 
 export type SiteAction = { label: string; url: string }
-
-const styles = {
-  primary:
-    'bg-emerald-800 text-white transition hover:bg-emerald-700 focus-visible:outline-emerald-700',
-  secondary:
-    'border border-emerald-800 text-emerald-900 transition hover:bg-emerald-50 focus-visible:outline-emerald-700',
-  inverse: 'border border-white/30 text-white transition hover:bg-white/10',
-  light: 'bg-white text-emerald-950 transition hover:bg-stone-100',
-}
 
 const isExternal = (url: string) => /^(https?:)?\/\/|^mailto:|^tel:/.test(url)
 
@@ -24,20 +16,17 @@ export const Action: React.FC<{
   action?: SiteAction | null
   children?: React.ReactNode
   className?: string
-  variant?: keyof typeof styles
-}> = ({ action, children, className, variant = 'primary' }) => {
+  size?: ButtonProps['size']
+  variant?: ButtonProps['variant']
+}> = ({ action, children, className, size = 'lg', variant = 'default' }) => {
   if (!action?.url) return null
 
-  const classes = cn(
-    'inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold sm:text-base',
-    styles[variant],
-    className,
-  )
+  const classes = cn(buttonVariants({ size, variant }), className)
 
   if (isExternal(action.url)) {
     return (
       <a className={classes} href={action.url} rel="noreferrer" target="_blank">
-        {action.label}
+        <span>{action.label}</span>
         <span className="sr-only"> (opens in a new tab)</span>
         {children}
       </a>
@@ -46,7 +35,7 @@ export const Action: React.FC<{
 
   return (
     <Link className={classes} href={action.url}>
-      {action.label}
+      <span>{action.label}</span>
       {children}
     </Link>
   )

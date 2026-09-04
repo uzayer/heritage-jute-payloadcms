@@ -1,143 +1,179 @@
-import { Quote } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
 import React from 'react'
 
 import type { Page } from '@/payload-types'
 
+import { buttonVariants } from '@/components/ui/button'
+import { Reveal } from '@/components/motion/reveal'
+import { cn } from '@/utilities/ui'
+
 import { Action } from './Action'
+import { GalleryMarquee } from './GalleryMarquee'
 import { MediaImage } from './MediaImage'
 import { SectionIcon } from './SectionIcon'
 
 type About = NonNullable<Page['about']>
 
 export const AboutIntro: React.FC<{ intro: About['intro'] }> = ({ intro }) => (
-  <>
-    <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-      <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-800">
-        {intro.eyebrow}
-      </p>
-      <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-        {intro.heading}
-      </h1>
-      <p className="mt-6 max-w-3xl text-lg leading-8 text-stone-600">{intro.description}</p>
+  <section>
+    <div className="border-muted-foreground/20">
+      <div className="container border-x border-muted-foreground/20 py-32">
+        <Reveal className="mb-14 flex flex-col gap-5 lg:w-2/3" direction="none" eager>
+          <h1 className="text-5xl font-semibold tracking-tighter lg:text-6xl">{intro.heading}</h1>
+          <p className="text-lg text-muted-foreground md:text-xl">{intro.description}</p>
+        </Reveal>
 
-      <div className="mt-12 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-        {intro.mainImage ? (
-          <div className="overflow-hidden rounded-2xl border border-stone-200">
-            <MediaImage className="aspect-[16/10]" loading="eager" media={intro.mainImage} />
+        <div className="grid gap-7 lg:grid-cols-3">
+          <div className="relative aspect-[3/2] max-h-[620px] overflow-hidden rounded-xl lg:col-span-2">
+            {intro.mainImage ? (
+              <MediaImage className="absolute inset-0 size-full object-cover" loading="eager" media={intro.mainImage} />
+            ) : null}
           </div>
-        ) : null}
-        <div className="grid gap-6">
-          {intro.secondaryImage ? (
-            <div className="overflow-hidden rounded-2xl border border-stone-200">
-              <MediaImage className="aspect-[4/3]" media={intro.secondaryImage} />
-            </div>
-          ) : null}
-          <div className="rounded-2xl bg-emerald-950 p-6 text-white">
-            <h2 className="text-lg font-semibold">{intro.breakout.title}</h2>
-            <p className="mt-3 text-sm leading-6 text-stone-300">{intro.breakout.description}</p>
-            <Action action={intro.breakout.primaryAction} className="mt-5" variant="light" />
+          <div className="flex flex-col gap-8 md:flex-row lg:flex-col">
+            <Reveal
+              className="flex flex-col justify-between gap-6 rounded-xl bg-muted p-7 md:w-1/2 lg:w-auto"
+              delay={0.1}
+            >
+              <Image
+                alt="Heritage Jute Fibers"
+                className="mr-auto h-12 w-auto dark:invert"
+                height={48}
+                src="/logo.svg"
+                width={300}
+              />
+              <div>
+                <p className="mb-2 text-lg font-semibold">{intro.breakout.title}</p>
+                <p className="text-muted-foreground">{intro.breakout.description}</p>
+              </div>
+              {intro.breakout.primaryAction?.url ? (
+                <Link className={cn(buttonVariants({ variant: 'outline' }), 'mr-auto')} href={intro.breakout.primaryAction.url}>
+                  {intro.breakout.primaryAction.label}
+                </Link>
+              ) : null}
+            </Reveal>
+            <Reveal className="relative aspect-[3/2] w-full overflow-hidden rounded-xl md:w-1/2 lg:min-h-0 lg:w-full" delay={0.15} direction="none">
+              {intro.secondaryImage ? (
+                <MediaImage className="absolute inset-0 size-full object-cover" media={intro.secondaryImage} />
+              ) : null}
+            </Reveal>
           </div>
         </div>
-      </div>
-    </section>
 
-    <section className="border-y border-stone-200 bg-white">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          {intro.achievementsHeading}
-        </h2>
-        <p className="mt-4 max-w-2xl leading-7 text-stone-600">{intro.achievementsDescription}</p>
-        <dl className="mt-9 grid grid-cols-2 gap-4 md:grid-cols-4">
-          {intro.achievements?.map((achievement) => (
-            <div className="rounded-xl bg-stone-100 p-5" key={achievement.id ?? achievement.label}>
-              <dt className="text-3xl font-semibold text-emerald-900">{achievement.value}</dt>
-              <dd className="mt-2 text-sm text-stone-600">{achievement.label}</dd>
-            </div>
+        <Reveal className="relative mt-8 overflow-hidden rounded-xl bg-muted p-7 md:mt-10 md:p-16" direction="none">
+          <div className="flex flex-col gap-4 text-center md:text-left">
+            <h2 className="text-3xl font-medium md:text-4xl">{intro.achievementsHeading}</h2>
+            <p className="max-w-xl text-muted-foreground">{intro.achievementsDescription}</p>
+          </div>
+          <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-8 md:flex md:flex-wrap md:justify-between">
+            {intro.achievements?.map((achievement) => (
+              <div className="flex flex-col gap-2 text-center md:text-left" key={achievement.id ?? achievement.label}>
+                <span className="font-mono text-4xl font-semibold md:text-5xl">{achievement.value}</span>
+                <p className="text-sm md:text-base">{achievement.label}</p>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+
+        <div className="mx-auto grid max-w-5xl gap-16 py-28 md:grid-cols-2 md:gap-28">
+          {intro.sections?.map((section, index) => (
+            <Reveal delay={index * 0.05} key={section.id ?? section.title}>
+              <h2 className="mb-5 text-4xl font-medium">{section.title}</h2>
+              <p className="text-lg leading-7 whitespace-pre-line text-muted-foreground">{section.content}</p>
+            </Reveal>
           ))}
-        </dl>
+        </div>
       </div>
-    </section>
-
-    <section className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 md:grid-cols-2 lg:px-8">
-      {intro.sections?.map((section) => (
-        <article key={section.id ?? section.title}>
-          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{section.title}</h2>
-          <p className="mt-5 whitespace-pre-line leading-7 text-stone-600">{section.content}</p>
-        </article>
-      ))}
-    </section>
-  </>
+    </div>
+  </section>
 )
 
 export const AboutGallery: React.FC<{ gallery: About['gallery'] }> = ({ gallery }) => (
-  <section className="border-y border-stone-200 bg-white px-4 py-16 sm:px-6 lg:px-8">
-    <div className="mx-auto max-w-6xl">
-      <div className="flex flex-wrap items-baseline justify-between gap-4">
-        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{gallery.heading}</h2>
-        <Action action={gallery.primaryAction} className="px-0 py-0" variant="secondary" />
+  <section aria-labelledby="gallery7-heading" className="border-t border-muted-foreground/20">
+    <div className="container border-x border-muted-foreground/20 px-6 py-10 md:py-14">
+      <div className="mb-10 grid grid-cols-1 gap-6 md:mb-12 md:grid-cols-2 md:gap-x-12 md:gap-y-4">
+        <Reveal className="flex flex-col gap-6" direction="none">
+          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl" id="gallery7-heading">
+            {gallery.heading}
+          </h2>
+          {gallery.primaryAction?.url ? (
+            <Link className={cn(buttonVariants({ variant: 'link' }), 'w-fit font-medium')} href={gallery.primaryAction.url}>
+              {gallery.primaryAction.label}
+            </Link>
+          ) : null}
+        </Reveal>
+        <Reveal delay={0.08} direction="none">
+          <p className="text-sm text-muted-foreground md:text-base">{gallery.description}</p>
+        </Reveal>
       </div>
-      <ul className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        {gallery.images?.map((entry, index) => (
-          <li
-            className="overflow-hidden rounded-xl border border-stone-200"
-            key={entry.id ?? index}
-          >
-            <MediaImage className="aspect-square" media={entry.image} />
-          </li>
-        ))}
-      </ul>
+      {gallery.images?.length ? <GalleryMarquee images={gallery.images} /> : null}
     </div>
   </section>
 )
 
 export const AboutNumbers: React.FC<{ numbers: About['numbers'] }> = ({ numbers }) => (
-  <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-    <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr]">
-      <div>
-        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{numbers.heading}</h2>
-        <p className="mt-5 leading-7 text-stone-600">
-          {numbers.descriptionPrefix}
-          <strong className="font-semibold text-stone-900">{numbers.descriptionEmphasis}</strong>
-          {numbers.descriptionSuffix}
-        </p>
-        <p className="mt-4 leading-7 text-stone-600">{numbers.introText}</p>
-        <dl className="mt-8 grid grid-cols-2 gap-4">
-          {numbers.stats?.map((stat) => (
-            <div className="rounded-xl bg-stone-100 p-5" key={stat.id ?? stat.label}>
-              <dt className="text-3xl font-semibold text-emerald-900">{stat.value}</dt>
-              <dd className="mt-2 text-sm text-stone-600">{stat.label}</dd>
+  <section>
+    <div className="border-t border-muted-foreground/20">
+      <div className="mx-auto max-w-5xl space-y-8 border-x border-muted-foreground/20 px-6 py-16 md:space-y-12 md:py-32">
+        <Reveal className="relative z-10 max-w-xl space-y-6" direction="none">
+          <h2 className="text-4xl font-medium lg:text-5xl">{numbers.heading}</h2>
+          <p>
+            {numbers.descriptionPrefix}
+            <span className="font-medium">{numbers.descriptionEmphasis}</span>
+            {numbers.descriptionSuffix}
+          </p>
+        </Reveal>
+        <div className="grid gap-6 sm:grid-cols-2 md:gap-12 lg:gap-24">
+          <Reveal delay={0.05}>
+            <p>{numbers.introText}</p>
+            <div className="mt-12 mb-12 grid grid-cols-2 gap-2 md:mb-0">
+              {numbers.stats?.map((stat) => (
+                <div className="space-y-4" key={stat.id ?? stat.label}>
+                  <div className="bg-linear-to-r from-zinc-950 to-zinc-600 bg-clip-text text-5xl font-bold text-transparent dark:from-white dark:to-zinc-800">
+                    {stat.value}
+                  </div>
+                  <p>{stat.label}</p>
+                </div>
+              ))}
             </div>
-          ))}
-        </dl>
+          </Reveal>
+          <Reveal className="relative" delay={0.1}>
+            <blockquote className="border-l-4 pl-4">
+              <p>{numbers.testimonial.quote}</p>
+              <div className="mt-6 space-y-1">
+                <cite className="block font-medium not-italic">{numbers.testimonial.author}</cite>
+                <p className="text-sm text-muted-foreground">{numbers.testimonial.role}</p>
+              </div>
+            </blockquote>
+          </Reveal>
+        </div>
       </div>
-
-      <figure className="rounded-2xl border border-stone-200 bg-white p-6">
-        <Quote aria-hidden className="size-6 text-emerald-800" />
-        <blockquote className="mt-4 leading-7 text-stone-700">
-          {numbers.testimonial.quote}
-        </blockquote>
-        <figcaption className="mt-5 text-sm text-stone-600">
-          <span className="font-semibold text-stone-900">{numbers.testimonial.author}</span>
-          <span className="block">{numbers.testimonial.role}</span>
-        </figcaption>
-      </figure>
     </div>
   </section>
 )
 
 export const AboutReasons: React.FC<{ reasons: About['reasons'] }> = ({ reasons }) => (
-  <section className="bg-emerald-950 px-4 py-20 text-white sm:px-6 lg:px-8">
-    <div className="mx-auto max-w-6xl">
-      <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{reasons.heading}</h2>
-      <p className="mt-5 max-w-3xl leading-7 text-stone-300">{reasons.description}</p>
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {reasons.items?.map((item) => (
-          <article className="rounded-2xl border border-white/15 p-6" key={item.id ?? item.title}>
-            <SectionIcon className="size-6 text-emerald-300" name={item.icon} />
-            <h3 className="mt-4 text-lg font-semibold">{item.title}</h3>
-            <p className="mt-3 text-sm leading-6 text-stone-300">{item.description}</p>
-          </article>
-        ))}
+  <section>
+    <div className="border-t border-muted-foreground/20">
+      <div className="container border-x border-muted-foreground/20 py-12 md:py-20">
+        <div className="mx-auto max-w-5xl space-y-8 md:space-y-16">
+          <Reveal className="relative z-10 mx-auto max-w-xl space-y-6 text-center md:space-y-12" direction="none">
+            <h2 className="text-balance text-4xl font-medium lg:text-5xl">{reasons.heading}</h2>
+            <p>{reasons.description}</p>
+          </Reveal>
+
+          <div className="relative mx-auto grid max-w-4xl divide-x divide-y border *:p-12 sm:grid-cols-2 lg:grid-cols-3">
+            {reasons.items?.map((item, index) => (
+              <Reveal className="space-y-2" delay={index * 0.05} key={item.id ?? item.title}>
+                <div className="flex items-center gap-2">
+                  <SectionIcon className="size-4" name={item.icon} />
+                  <h3 className="text-sm font-medium">{item.title}</h3>
+                </div>
+                <p className="text-sm">{item.description}</p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   </section>

@@ -15,7 +15,8 @@ export const MediaImage: React.FC<{
   className?: string
   loading?: 'eager' | 'lazy'
   media?: (number | null) | Media
-}> = ({ alt, className, loading = 'lazy', media }) => {
+  ref?: React.Ref<HTMLImageElement>
+}> = ({ alt, className, loading = 'lazy', media, ref }) => {
   const resource = typeof media === 'object' ? media : null
 
   if (!resource?.url) return null
@@ -27,6 +28,7 @@ export const MediaImage: React.FC<{
       className={cn('h-full w-full object-cover', className)}
       height={resource.height ?? undefined}
       loading={loading}
+      ref={ref}
       src={resource.url}
       width={resource.width ?? undefined}
     />

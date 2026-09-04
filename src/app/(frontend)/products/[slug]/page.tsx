@@ -1,8 +1,15 @@
+import { ArrowRight, MessageCircleMore } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { CallToActionSection } from '@/components/site/CallToActionSection'
+import { MediaImage } from '@/components/site/MediaImage'
+import { ProductHeroSpecs, ProductSpecsSection } from '@/components/site/ProductSpecs'
+import { buttonVariants } from '@/components/ui/button'
+import { textLinkVariants } from '@/components/ui/interactive'
 import { getPublishedProductBySlug, getPublishedProducts } from '@/utilities/products'
+import { buildBreadcrumbListLd, buildProductLd, JsonLd } from '@/utilities/structuredData'
 
 type Args = {
   params: Promise<{ slug: string }>
@@ -16,12 +23,13 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const product = await getPublishedProductBySlug((await params).slug)
 
-  if (!product) return {}
-
-  return {
-    description: product.shortDescription,
-    title: `${product.name} | Heritage Jute Fibers`,
-  }
+  return product
+    ? {
+        alternates: { canonical: `/products/${product.slug}` },
+        description: product.shortDescription,
+        title: `${product.name} | Heritage Jute Fibers`,
+      }
+    : {}
 }
 
 export default async function ProductDetailPage({ params }: Args) {
@@ -29,148 +37,106 @@ export default async function ProductDetailPage({ params }: Args) {
 
   if (!product) notFound()
 
-  const image = typeof product.image === 'object' ? product.image : null
-  const highlightedSpecifications = product.specificationGroups
-    ?.flatMap((group) => group.specifications ?? [])
-    .filter((specification) => specification.highlight)
-    .slice(0, 4)
+  const quoteHref = `/contact?product=${encodeURIComponent(product.name)}`
 
   return (
-    <main className="bg-stone-50 text-stone-900">
-      <section className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8">
-        <div>
-          <Link className="text-sm font-medium text-emerald-800 underline" href="/products">
-            Products
-          </Link>
-          <p className="mt-6 text-sm font-semibold uppercase tracking-[0.16em] text-emerald-800">
-            {product.category}
-          </p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">{product.name}</h1>
-          <p className="mt-5 text-lg leading-8 text-stone-600">{product.shortDescription}</p>
-          <div className="mt-8 grid gap-px overflow-hidden rounded-xl border border-stone-200 bg-stone-200 sm:grid-cols-2">
-            {highlightedSpecifications?.map((specification) => (
-              <div className="bg-white p-4" key={specification.id}>
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-stone-500">
-                  {specification.label}
-                </p>
-                <p className="mt-2 font-semibold">{specification.value}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="overflow-hidden rounded-2xl bg-stone-200 shadow-sm">
-          {image?.url ? (
-            // This is intentionally a plain image: R2 serves the public Media Asset URL directly.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              alt={image.alt ?? product.name}
-              className="aspect-[4/3] h-full w-full object-cover"
-              src={image.url}
-            />
-          ) : (
-            <div
-              aria-label={`${product.name} image`}
-              className="aspect-[4/3] bg-stone-200"
-              role="img"
-            />
-          )}
-        </div>
-      </section>
+    <main className="bg-background text-foreground">
+      <JsonLd
+        data={buildBreadcrumbListLd([
+          { name: 'Home', path: '/' },
+          { name: 'Products', path: '/products' },
+          { name: product.name, path: `/products/${product.slug}` },
+        ])}
+      />
+      <JsonLd data={buildProductLd(product)} />
 
-      <section className="border-t border-stone-200 bg-white">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.4fr_1fr] lg:px-8">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight">Product overview</h2>
-            <div className="mt-5 space-y-4 leading-7 text-stone-600">
-              {product.overview?.map((paragraph) => (
-                <p key={paragraph.id}>{paragraph.paragraph}</p>
-              ))}
+      <div className="border-muted-foreground/20">
+        <div className="container max-w-6xl border-x border-muted-foreground/20 py-12">
+          <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            <div>
+              <div className="mb-2 text-sm text-muted-foreground">
+                <Link className={textLinkVariants({ tone: 'muted' })} href="/products">
+                  <span data-slot="link-label">Products</span>
+                </Link>{' '}
+                / {product.category}
+              </div>
+              <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">{product.name}</h1>
+              <p className="mt-4 text-lg text-muted-foreground">{product.shortDescription}</p>
+
+              <ProductHeroSpecs specificationGroups={product.specificationGroups} />
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link className={buttonVariants()} href={quoteHref}>
+                  <span>Request a Quote</span>
+                  <MessageCircleMore aria-hidden className="size-4" />
+                </Link>
+                <Link className={buttonVariants({ variant: 'outline' })} href="/contact">
+                  <span>Contact Us</span>
+                  <ArrowRight aria-hidden className="size-4" />
+                </Link>
+              </div>
+            </div>
+            <div className="relative aspect-4/3 overflow-hidden rounded-xl border border-border bg-muted">
+              <MediaImage alt={product.name} className="absolute inset-0 size-full object-cover" loading="eager" media={product.image} />
             </div>
           </div>
-          <aside className="rounded-2xl bg-stone-100 p-6">
-            <h2 className="text-xl font-semibold">Buyer checklist</h2>
-            <ul className="mt-4 space-y-3 text-sm leading-6 text-stone-600">
-              {product.buyerChecklist?.map((item) => (
-                <li key={item.id}>✓ {item.item}</li>
-              ))}
-            </ul>
-          </aside>
         </div>
-        <div className="mx-auto grid max-w-6xl gap-6 px-4 pb-16 sm:px-6 md:grid-cols-2 lg:px-8">
-          <section className="rounded-2xl border border-stone-200 p-6">
-            <h2 className="text-xl font-semibold">Common applications</h2>
-            <ul className="mt-4 space-y-3 text-sm leading-6 text-stone-600">
-              {product.applications?.map((application) => (
-                <li key={application.id}>{application.item}</li>
-              ))}
-            </ul>
-          </section>
-          {product.customization && product.customization.length > 0 && (
-            <section className="rounded-2xl border border-stone-200 p-6">
-              <h2 className="text-xl font-semibold">Customization &amp; supply options</h2>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-stone-600">
-                {product.customization.map((option) => (
-                  <li key={option.id}>{option.item}</li>
+      </div>
+
+      <div className="border-t border-muted-foreground/20">
+        <div className="container max-w-6xl border-x border-muted-foreground/20 py-16 md:py-20">
+          <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
+            <div>
+              <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted-foreground">Product Overview</p>
+              <div className="mt-4 space-y-4 text-base leading-7 text-muted-foreground">
+                {product.overview?.map((paragraph) => <p key={paragraph.id ?? paragraph.paragraph}>{paragraph.paragraph}</p>)}
+              </div>
+            </div>
+            <div className="rounded-xl border border-border bg-muted/20 p-6">
+              <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted-foreground">Buyer Checklist</p>
+              <ul className="mt-4 space-y-3">
+                {product.buyerChecklist?.map((note) => (
+                  <li className="flex gap-2.5 text-sm leading-6 text-muted-foreground" key={note.id ?? note.item}>
+                    <span aria-hidden className="mt-0.5 text-emerald-600">
+                      ✓
+                    </span>
+                    <span>{note.item}</span>
+                  </li>
                 ))}
               </ul>
-            </section>
-          )}
-        </div>
-      </section>
-
-      <section className="border-t border-stone-200 px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-6xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-800">
-            Export sheet
-          </p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight">Technical specifications</h2>
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
-            {product.specificationGroups?.map((group) => (
-              <section className="rounded-2xl border border-stone-200 bg-white p-6" key={group.id}>
-                <h3 className="text-xl font-semibold">{group.name}</h3>
-                {group.description && (
-                  <p className="mt-2 text-sm text-stone-600">{group.description}</p>
-                )}
-                <dl className="mt-5 divide-y divide-stone-100 text-sm">
-                  {group.specifications?.map((specification) => (
-                    <div className="flex justify-between gap-4 py-3" key={specification.id}>
-                      <dt className="text-stone-500">{specification.label}</dt>
-                      <dd className="text-right font-medium">{specification.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </section>
-            ))}
+            </div>
           </div>
 
-          {product.variants && product.variants.length > 0 && (
-            <div className="mt-10">
-              <h2 className="text-2xl font-semibold tracking-tight">Product variants</h2>
-              <div className="mt-5 grid gap-4 md:grid-cols-2">
-                {product.variants.map((variant) => (
-                  <section
-                    className="rounded-2xl border border-stone-200 bg-white p-6"
-                    key={variant.id}
-                  >
-                    <h3 className="font-semibold">{variant.name}</h3>
-                    {variant.description && (
-                      <p className="mt-2 text-sm text-stone-600">{variant.description}</p>
-                    )}
-                    <dl className="mt-4 divide-y divide-stone-100 text-sm">
-                      {variant.specifications?.map((specification) => (
-                        <div className="flex justify-between gap-4 py-3" key={specification.id}>
-                          <dt className="text-stone-500">{specification.label}</dt>
-                          <dd className="text-right font-medium">{specification.value}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  </section>
-                ))}
-              </div>
+          <div className="mt-10 grid gap-6 md:grid-cols-2">
+            <div className="rounded-xl border border-border p-6">
+              <h2 className="text-xl font-semibold tracking-tight">Common Applications</h2>
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-muted-foreground">
+                {product.applications?.map((application) => <li key={application.id ?? application.item}>{application.item}</li>)}
+              </ul>
             </div>
-          )}
+            {product.customization && product.customization.length > 0 ? (
+              <div className="rounded-xl border border-border p-6">
+                <h2 className="text-xl font-semibold tracking-tight">Customization &amp; Supply Options</h2>
+                <ul className="mt-4 space-y-3 text-sm leading-6 text-muted-foreground">
+                  {product.customization.map((item) => <li key={item.id ?? item.item}>{item.item}</li>)}
+                </ul>
+              </div>
+            ) : null}
+          </div>
         </div>
-      </section>
+      </div>
+
+      <ProductSpecsSection specificationGroups={product.specificationGroups} variants={product.variants} />
+
+      <CallToActionSection
+        cta={{
+          heading: `Need a quote for ${product.name}?`,
+          description:
+            "Send your required quantity, packing preference, destination port, and target Incoterm. We'll respond with the next sourcing step within one business day.",
+          primaryAction: { label: 'Request a Quote', url: quoteHref },
+          secondaryAction: { label: 'Send an Inquiry', url: '/contact' },
+        }}
+      />
     </main>
   )
 }

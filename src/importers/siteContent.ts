@@ -63,11 +63,36 @@ type SiteSource = {
 type NavigationSource = {
   buttons: { label: string; url: string }[]
   items: {
-    links?: { description?: string; label: string; url: string }[]
+    links?: { description?: string; image?: string; label: string; url: string }[]
     title: string
     url?: string
   }[]
   logo: { alt: string; src: string }
+  mobile_items: {
+    links?: { label: string; url: string }[]
+    title: string
+    url?: string
+  }[]
+}
+
+/**
+ * The Astro site's Products dropdown links to anchors on a single `/products` page
+ * (`/products#raw-materials`). This port gives every product its own route, so each
+ * anchor is mapped to the product slug that represents its category.
+ */
+const productAnchorSlugs: Record<string, string> = {
+  'bags-packaging': 'jute-bag',
+  'fabrics-cloth': 'hessian-cloth',
+  'raw-materials': 'raw-jute',
+  'rope-twine': 'jute-rope',
+  yarn: 'jute-yarn',
+}
+
+const toProductRoute = (url: string) => {
+  const anchor = url.split('#')[1]
+  const slug = anchor ? productAnchorSlugs[anchor] : undefined
+
+  return slug ? `/products/${slug}` : url
 }
 
 type FooterSource = { columns: { heading: string; links: { label: string; url: string }[] }[] }
@@ -180,6 +205,8 @@ const componentCopy = {
     'Answers to the most common questions from importers about ordering, payment, shipping, and customisation.',
   footerCredentials: 'BJGEA Member · ERC Registered · Jute Ministry Approved',
   galleryHeading: 'Product gallery',
+  galleryIntro:
+    'From raw fibre to yarn, fabrics, bags, and rope — a snapshot of the range we export to buyers worldwide.',
   galleryLinkLabel: 'Browse our catalog',
   galleryLinkURL: '/products',
 }
@@ -287,11 +314,30 @@ export async function importMarketingSite(payload: Payload, options: ImportOptio
         network: toSocialNetwork(link.network),
         url: link.url,
       })),
-      summary: homeSource.data.description,
+      summary: `Government-certified jute exporter based in ${site.address.locality}, Bangladesh. Established ${site.established_year}. Supplying 31 countries across 6 continents.`,
       website: site.web,
       whatsappUrl: site.whatsapp_url,
     },
   })
+
+  // SQLite takes one write transaction at a time, so dropdown-link thumbnails are
+  // uploaded in sequence rather than concurrently (same constraint as the gallery below).
+  const navItems = []
+
+  for (const item of navigation.items) {
+    const links = []
+
+    for (const link of item.links ?? []) {
+      links.push({
+        description: link.description,
+        image: link.image ? await upload({ alt: link.label, src: link.image }) : undefined,
+        label: link.label,
+        url: toProductRoute(link.url),
+      })
+    }
+
+    navItems.push({ label: item.title, links, url: item.url ?? '/' })
+  }
 
   await payload.updateGlobal({
     slug: 'header',
@@ -300,15 +346,15 @@ export async function importMarketingSite(payload: Payload, options: ImportOptio
       ctaLabel: navigation.buttons[0]?.label ?? 'WhatsApp',
       ctaUrl: navigation.buttons[0]?.url ?? site.whatsapp_url,
       logo: await upload(navigation.logo),
-      navItems: navigation.items.map((item) => ({
-        label: item.title,
-        links: (item.links ?? []).map((link) => ({
-          description: link.description,
+      mobileGroups: navigation.mobile_items.map((group) => ({
+        links: (group.links ?? []).map((link) => ({
           label: link.label,
-          url: link.url,
+          url: toProductRoute(link.url),
         })),
-        url: item.url ?? '/',
+        title: group.title,
+        url: group.url,
       })),
+      navItems,
     },
   })
 
@@ -386,6 +432,7 @@ export async function importMarketingSite(payload: Payload, options: ImportOptio
         compliance: toCompliance(about.compliance),
         cta: toCta(about.cta),
         gallery: {
+          description: componentCopy.galleryIntro,
           heading: componentCopy.galleryHeading,
           images: galleryImages,
           primaryAction: toAction(componentCopy.galleryLinkLabel, componentCopy.galleryLinkURL),

@@ -2,39 +2,47 @@ import type { Page } from '@/payload-types'
 
 import config from '@payload-config'
 import { draftMode } from 'next/headers'
+import { unstable_cache } from 'next/cache'
 import { getPayload } from 'payload'
 import { cache } from 'react'
 
-const findSitePage = cache(
-  async (pageType: Page['pageType'], draft: boolean): Promise<Page | null> => {
-    const payload = await getPayload({ config })
+const findSitePage = async (pageType: Page['pageType'], draft: boolean): Promise<Page | null> => {
+  const payload = await getPayload({ config })
 
-    const pages = await payload.find({
-      collection: 'pages',
-      depth: 1,
-      draft,
-      limit: 1,
-      // A buyer's own read: without this an unpublished Site Page would be served to
-      // the public. In draft mode the preview route has already authenticated the
-      // Site Administrator, so the same check lets their draft through.
-      overrideAccess: false,
-      pagination: false,
-      where: { pageType: { equals: pageType } },
-    })
+  const pages = await payload.find({
+    collection: 'pages',
+    depth: 1,
+    draft,
+    limit: 1,
+    // A buyer's own read: without this an unpublished Site Page would be served to
+    // the public. In draft mode the preview route has already authenticated the
+    // Site Administrator, so the same check lets their draft through.
+    overrideAccess: false,
+    pagination: false,
+    where: { pageType: { equals: pageType } },
+  })
 
-    return pages.docs[0] ?? null
-  },
+  return pages.docs[0] ?? null
+}
+
+// Published pages are shared public content. Cache them across requests and let the
+// collection hook invalidate the tag whenever an editor changes a page. Draft mode
+// deliberately bypasses this cache so preview users always see their latest work.
+const findCachedPublishedSitePage = unstable_cache(
+  async (pageType: Page['pageType']) => findSitePage(pageType, false),
+  ['published-site-page'],
+  { tags: ['site-pages'] },
 )
 
 /**
  * Reads one of the five fixed Site Pages for a public route, honouring Next's draft
  * mode so the Site Administrator can preview an unpublished change.
  */
-export const getSitePage = async (pageType: Page['pageType']): Promise<Page | null> => {
-  const { isEnabled } = await draftMode()
+export const getSitePage = cache(async (pageType: Page['pageType'], draft?: boolean): Promise<Page | null> => {
+  const isDraft = draft ?? (await draftMode()).isEnabled
 
-  return findSitePage(pageType, isEnabled)
-}
+  return isDraft ? findSitePage(pageType, true) : findCachedPublishedSitePage(pageType)
+})
 
 /**
  * The same read, but throwing when the page is missing. Every public route this backs
@@ -42,8 +50,8 @@ export const getSitePage = async (pageType: Page['pageType']): Promise<Page | nu
  * migrated without `pnpm import:marketing-site` having been run — a broken deployment
  * rather than a 404 a buyer should ever see.
  */
-export const requireSitePage = async (pageType: Page['pageType']): Promise<Page> => {
-  const page = await getSitePage(pageType)
+export const requireSitePage = async (pageType: Page['pageType'], draft?: boolean): Promise<Page> => {
+  const page = await getSitePage(pageType, draft)
 
   if (!page) {
     throw new Error(

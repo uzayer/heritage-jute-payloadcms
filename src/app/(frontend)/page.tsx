@@ -16,23 +16,25 @@ import {
   HomeProductRange,
 } from '@/components/site/HomeSections'
 import { requireSitePage } from '@/utilities/sitePages'
+import { buildFaqPageLd, JsonLd } from '@/utilities/structuredData'
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await requireSitePage('home')
 
-  return { description: page.description, title: page.title }
+  return { alternates: { canonical: '/' }, description: page.description, title: page.title }
 }
 
 export default async function HomePage() {
   const { isEnabled: draft } = await draftMode()
-  const page = await requireSitePage('home')
+  const page = await requireSitePage('home', draft)
   const home = page.home
 
   if (!home) throw new Error('The Home Site Page is missing its content.')
 
   return (
-    <main className="bg-stone-50 text-stone-900">
+    <main className="bg-background text-foreground">
       {draft ? <LivePreviewListener /> : null}
+      {home.faqs.items?.length ? <JsonLd data={buildFaqPageLd(home.faqs.items)} /> : null}
       <HomeHero hero={home.hero} />
       <HomeProductRange productRange={home.productRange} />
       <HomeGlobalReach globalReach={home.globalReach} />

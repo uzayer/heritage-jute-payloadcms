@@ -383,6 +383,7 @@ export interface Page {
          */
         url: string;
       };
+      description: string;
       images?:
         | {
             image?: (number | null) | Media;
@@ -1453,6 +1454,7 @@ export interface PagesSelect<T extends boolean = true> {
                     label?: T;
                     url?: T;
                   };
+              description?: T;
               images?:
                 | T
                 | {
@@ -2101,6 +2103,27 @@ export interface Header {
               label: string;
               description?: string | null;
               url: string;
+              /**
+               * Thumbnail shown next to this link in the dropdown.
+               */
+              image?: (number | null) | Media;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The grouped links shown in the mobile menu (e.g. "Company" grouping About/Certifications/Contact). Rendered instead of navItems on small screens.
+   */
+  mobileGroups?:
+    | {
+        title: string;
+        url?: string | null;
+        links?:
+          | {
+              label: string;
+              url: string;
               id?: string | null;
             }[]
           | null;
@@ -2202,6 +2225,21 @@ export interface HeaderSelect<T extends boolean = true> {
           | {
               label?: T;
               description?: T;
+              url?: T;
+              image?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  mobileGroups?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        links?:
+          | T
+          | {
+              label?: T;
               url?: T;
               id?: T;
             };

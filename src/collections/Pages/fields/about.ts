@@ -73,6 +73,7 @@ export const about: GroupField = {
       fields: [
         headingField(),
         action('primaryAction', 'Link below the heading'),
+        { name: 'description', type: 'textarea', required: true },
         {
           name: 'images',
           type: 'array',

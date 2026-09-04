@@ -86,11 +86,11 @@ describe('Marketing site', () => {
     expect(header.logo).toEqual(expect.any(Number))
     expect(header.navItems?.map((item) => item.label)).toEqual(['Products', 'About', 'Contact'])
     expect(header.navItems?.[0]?.links?.map((link) => link.url)).toEqual([
-      '/products#raw-materials',
-      '/products#yarn',
-      '/products#fabrics-cloth',
-      '/products#bags-packaging',
-      '/products#rope-twine',
+      '/products/raw-jute',
+      '/products/jute-yarn',
+      '/products/hessian-cloth',
+      '/products/jute-bag',
+      '/products/jute-rope',
     ])
     expect(header.ctaUrl).toBe(company.whatsappUrl)
 

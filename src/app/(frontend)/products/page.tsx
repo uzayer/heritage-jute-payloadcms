@@ -1,66 +1,52 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 
+import { CallToActionSection } from '@/components/site/CallToActionSection'
+import { ProductCategoryGrid } from '@/components/site/ProductCategoryGrid'
 import { getPublishedProducts } from '@/utilities/products'
+import { buildItemListLd, JsonLd } from '@/utilities/structuredData'
+
+/**
+ * The listing page has no CMS-editable Site Page group yet (Astro's real
+ * `pages/products.md` content entry, mirrored here as static copy so the
+ * page reads exactly as the live site does).
+ */
+const PAGE = {
+  title: 'Jute Products — Heritage Jute Fibers',
+  description:
+    "Browse Heritage Jute's product catalog: raw jute, jute yarn, hessian cloth, sacking cloth, jute bags, sacking sacks, jute rope, and twine.",
+  heading: 'Our Jute Product Catalog',
+  intro:
+    '11 product lines across 5 categories — from raw fibre to finished bags. Container-load quantities, government-certified quality.',
+  catalogButtonLabel: 'Request a Quote',
+  catalogButtonHref: 'https://wa.me/8801841111625',
+  cta: {
+    heading: 'Need a Quote?',
+    description: "Tell us the product, quantity, and destination — we'll get back to you within one business day.",
+    primaryAction: { label: 'WhatsApp', url: 'https://wa.me/8801841111625' },
+    secondaryAction: { label: 'Send an Inquiry', url: '/contact' },
+  },
+}
 
 export const metadata: Metadata = {
-  description:
-    'Export-ready jute fiber, rope, yarn, cloth, bag, and packaging products from Bangladesh.',
-  title: 'Products | Heritage Jute Fibers',
+  alternates: { canonical: '/products' },
+  description: PAGE.description,
+  title: PAGE.title,
 }
 
 export default async function ProductsPage() {
   const { docs: products } = await getPublishedProducts()
-  const productsByCategory = new Map<string, typeof products>()
-
-  for (const product of products) {
-    productsByCategory.set(product.category, [
-      ...(productsByCategory.get(product.category) ?? []),
-      product,
-    ])
-  }
 
   return (
-    <main className="bg-stone-50 px-4 py-16 text-stone-900 sm:px-6 lg:px-8">
-      <section className="mx-auto max-w-6xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-800">
-          Heritage Jute Fibers
-        </p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-          Export product catalogue
-        </h1>
-        <p className="mt-5 max-w-2xl text-lg leading-8 text-stone-600">
-          Review buyer-facing product details, technical specifications, packing, and supply options
-          before requesting a quote.
-        </p>
-
-        <div className="mt-10 space-y-12">
-          {[...productsByCategory].map(([category, categoryProducts]) => (
-            <section key={category}>
-              <h2 className="text-2xl font-semibold tracking-tight">{category}</h2>
-              <div className="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {categoryProducts.map((product) => (
-                  <article
-                    className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm"
-                    key={product.id}
-                  >
-                    <h3 className="text-2xl font-semibold tracking-tight">{product.name}</h3>
-                    <p className="mt-3 text-sm leading-6 text-stone-600">
-                      {product.shortDescription}
-                    </p>
-                    <Link
-                      className="mt-6 inline-flex rounded-full bg-emerald-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
-                      href={`/products/${product.slug}`}
-                    >
-                      View {product.name}
-                    </Link>
-                  </article>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-      </section>
+    <main className="bg-background text-foreground">
+      <JsonLd data={buildItemListLd(PAGE.title, products)} />
+      <ProductCategoryGrid
+        catalogButtonHref={PAGE.catalogButtonHref}
+        catalogButtonLabel={PAGE.catalogButtonLabel}
+        heading={PAGE.heading}
+        intro={PAGE.intro}
+        products={products}
+      />
+      <CallToActionSection cta={PAGE.cta} />
     </main>
   )
 }

@@ -33,6 +33,34 @@ export const Header: GlobalConfig = {
             { name: 'label', type: 'text', required: true },
             { name: 'description', type: 'textarea' },
             { name: 'url', type: 'text', required: true },
+            {
+              name: 'image',
+              type: 'upload',
+              relationTo: 'media',
+              admin: { description: 'Thumbnail shown next to this link in the dropdown.' },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'mobileGroups',
+      type: 'array',
+      labels: { singular: 'Mobile navigation group', plural: 'Mobile navigation groups' },
+      admin: {
+        description:
+          'The grouped links shown in the mobile menu (e.g. "Company" grouping About/Certifications/Contact). Rendered instead of navItems on small screens.',
+      },
+      fields: [
+        { name: 'title', type: 'text', required: true },
+        { name: 'url', type: 'text' },
+        {
+          name: 'links',
+          type: 'array',
+          labels: { singular: 'Link', plural: 'Links' },
+          fields: [
+            { name: 'label', type: 'text', required: true },
+            { name: 'url', type: 'text', required: true },
           ],
         },
       ],
