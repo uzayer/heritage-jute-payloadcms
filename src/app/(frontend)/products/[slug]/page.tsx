@@ -1,5 +1,6 @@
 import { ArrowRight, MessageCircleMore } from 'lucide-react'
 import type { Metadata } from 'next'
+import { draftMode } from 'next/headers'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -8,7 +9,7 @@ import { MediaImage } from '@/components/site/MediaImage'
 import { ProductHeroSpecs, ProductSpecsSection } from '@/components/site/ProductSpecs'
 import { buttonVariants } from '@/components/ui/button'
 import { textLinkVariants } from '@/components/ui/interactive'
-import { getPublishedProductBySlug, getPublishedProducts } from '@/utilities/products'
+import { getProductBySlug, getPublishedProducts } from '@/utilities/products'
 import { buildBreadcrumbListLd, buildProductLd, JsonLd } from '@/utilities/structuredData'
 
 type Args = {
@@ -21,7 +22,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
-  const product = await getPublishedProductBySlug((await params).slug)
+  const { isEnabled: draft } = await draftMode()
+  const product = await getProductBySlug((await params).slug, draft)
 
   return product
     ? {
@@ -33,7 +35,8 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
 }
 
 export default async function ProductDetailPage({ params }: Args) {
-  const product = await getPublishedProductBySlug((await params).slug)
+  const { isEnabled: draft } = await draftMode()
+  const product = await getProductBySlug((await params).slug, draft)
 
   if (!product) notFound()
 
@@ -77,7 +80,12 @@ export default async function ProductDetailPage({ params }: Args) {
               </div>
             </div>
             <div className="relative aspect-4/3 overflow-hidden rounded-xl border border-border bg-muted">
-              <MediaImage alt={product.name} className="absolute inset-0 size-full object-cover" loading="eager" media={product.image} />
+              <MediaImage
+                alt={product.name}
+                className="absolute inset-0 size-full object-cover"
+                loading="eager"
+                media={product.image}
+              />
             </div>
           </div>
         </div>
@@ -87,16 +95,25 @@ export default async function ProductDetailPage({ params }: Args) {
         <div className="container max-w-6xl border-x border-muted-foreground/20 py-16 md:py-20">
           <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
             <div>
-              <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted-foreground">Product Overview</p>
+              <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                Product Overview
+              </p>
               <div className="mt-4 space-y-4 text-base leading-7 text-muted-foreground">
-                {product.overview?.map((paragraph) => <p key={paragraph.id ?? paragraph.paragraph}>{paragraph.paragraph}</p>)}
+                {product.overview?.map((paragraph) => (
+                  <p key={paragraph.id ?? paragraph.paragraph}>{paragraph.paragraph}</p>
+                ))}
               </div>
             </div>
             <div className="rounded-xl border border-border bg-muted/20 p-6">
-              <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted-foreground">Buyer Checklist</p>
+              <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                Buyer Checklist
+              </p>
               <ul className="mt-4 space-y-3">
                 {product.buyerChecklist?.map((note) => (
-                  <li className="flex gap-2.5 text-sm leading-6 text-muted-foreground" key={note.id ?? note.item}>
+                  <li
+                    className="flex gap-2.5 text-sm leading-6 text-muted-foreground"
+                    key={note.id ?? note.item}
+                  >
                     <span aria-hidden className="mt-0.5 text-emerald-600">
                       ✓
                     </span>
@@ -111,14 +128,20 @@ export default async function ProductDetailPage({ params }: Args) {
             <div className="rounded-xl border border-border p-6">
               <h2 className="text-xl font-semibold tracking-tight">Common Applications</h2>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-muted-foreground">
-                {product.applications?.map((application) => <li key={application.id ?? application.item}>{application.item}</li>)}
+                {product.applications?.map((application) => (
+                  <li key={application.id ?? application.item}>{application.item}</li>
+                ))}
               </ul>
             </div>
             {product.customization && product.customization.length > 0 ? (
               <div className="rounded-xl border border-border p-6">
-                <h2 className="text-xl font-semibold tracking-tight">Customization &amp; Supply Options</h2>
+                <h2 className="text-xl font-semibold tracking-tight">
+                  Customization &amp; Supply Options
+                </h2>
                 <ul className="mt-4 space-y-3 text-sm leading-6 text-muted-foreground">
-                  {product.customization.map((item) => <li key={item.id ?? item.item}>{item.item}</li>)}
+                  {product.customization.map((item) => (
+                    <li key={item.id ?? item.item}>{item.item}</li>
+                  ))}
                 </ul>
               </div>
             ) : null}
@@ -126,7 +149,10 @@ export default async function ProductDetailPage({ params }: Args) {
         </div>
       </div>
 
-      <ProductSpecsSection specificationGroups={product.specificationGroups} variants={product.variants} />
+      <ProductSpecsSection
+        specificationGroups={product.specificationGroups}
+        variants={product.variants}
+      />
 
       <CallToActionSection
         cta={{

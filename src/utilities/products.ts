@@ -1,5 +1,6 @@
 import { cache } from 'react'
 import { unstable_cache } from 'next/cache'
+import { draftMode } from 'next/headers'
 import { getPayload } from 'payload'
 
 import config from '@payload-config'
@@ -18,14 +19,16 @@ const findPublishedProducts = async () => {
   })
 }
 
-const findPublishedProductBySlug = async (slug: string) => {
+const findProductBySlug = async (slug: string, draft: boolean) => {
   const payload = await getPayload({ config })
   const products = await payload.find({
     collection: 'products',
     depth: 1,
-    draft: false,
+    draft,
     limit: 1,
-    overrideAccess: false,
+    // Draft mode is only enabled by the authenticated preview route. It can therefore
+    // bypass the public-only read constraint without exposing drafts to buyers.
+    overrideAccess: draft,
     pagination: false,
     where: {
       slug: {
@@ -44,9 +47,15 @@ const getCachedPublishedProducts = unstable_cache(findPublishedProducts, ['publi
   tags: ['products'],
 })
 
-const getCachedPublishedProductBySlug = unstable_cache(findPublishedProductBySlug, ['published-product-by-slug'], {
-  tags: ['products'],
-})
+const getCachedPublishedProductBySlug = unstable_cache(
+  (slug: string) => findProductBySlug(slug, false),
+  ['published-product-by-slug'],
+  { tags: ['products'] },
+)
 
 export const getPublishedProducts = cache(getCachedPublishedProducts)
-export const getPublishedProductBySlug = cache(getCachedPublishedProductBySlug)
+export const getProductBySlug = cache(async (slug: string, draft?: boolean) => {
+  const isDraft = draft ?? (await draftMode()).isEnabled
+
+  return isDraft ? findProductBySlug(slug, true) : getCachedPublishedProductBySlug(slug)
+})

@@ -3,6 +3,7 @@ import { slugField } from 'payload'
 
 import { authenticated } from '../access/authenticated'
 import { authenticatedOrPublished } from '../access/authenticatedOrPublished'
+import { generatePreviewPath } from '../utilities/generatePreviewPath'
 import { revalidateProduct, revalidateProductDelete } from './Products/hooks/revalidateProduct'
 
 const specificationFields = [
@@ -33,6 +34,21 @@ export const Products: CollectionConfig<'products'> = {
   },
   admin: {
     defaultColumns: ['name', 'category', 'updatedAt'],
+    group: 'Product Catalog',
+    livePreview: {
+      url: ({ data, req }) =>
+        generatePreviewPath({
+          collection: 'products',
+          req,
+          slug: data?.slug,
+        }),
+    },
+    preview: (data, { req }) =>
+      generatePreviewPath({
+        collection: 'products',
+        req,
+        slug: data?.slug as string,
+      }),
     useAsTitle: 'name',
   },
   fields: [

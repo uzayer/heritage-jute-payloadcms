@@ -14,10 +14,9 @@ const findSitePage = async (pageType: Page['pageType'], draft: boolean): Promise
     depth: 1,
     draft,
     limit: 1,
-    // A buyer's own read: without this an unpublished Site Page would be served to
-    // the public. In draft mode the preview route has already authenticated the
-    // Site Administrator, so the same check lets their draft through.
-    overrideAccess: false,
+    // Draft mode is only enabled by the authenticated preview route. It can therefore
+    // bypass the public-only read constraint without exposing drafts to buyers.
+    overrideAccess: draft,
     pagination: false,
     where: { pageType: { equals: pageType } },
   })
@@ -38,11 +37,13 @@ const findCachedPublishedSitePage = unstable_cache(
  * Reads one of the five fixed Site Pages for a public route, honouring Next's draft
  * mode so the Site Administrator can preview an unpublished change.
  */
-export const getSitePage = cache(async (pageType: Page['pageType'], draft?: boolean): Promise<Page | null> => {
-  const isDraft = draft ?? (await draftMode()).isEnabled
+export const getSitePage = cache(
+  async (pageType: Page['pageType'], draft?: boolean): Promise<Page | null> => {
+    const isDraft = draft ?? (await draftMode()).isEnabled
 
-  return isDraft ? findSitePage(pageType, true) : findCachedPublishedSitePage(pageType)
-})
+    return isDraft ? findSitePage(pageType, true) : findCachedPublishedSitePage(pageType)
+  },
+)
 
 /**
  * The same read, but throwing when the page is missing. Every public route this backs
@@ -50,7 +51,10 @@ export const getSitePage = cache(async (pageType: Page['pageType'], draft?: bool
  * migrated without `pnpm import:marketing-site` having been run — a broken deployment
  * rather than a 404 a buyer should ever see.
  */
-export const requireSitePage = async (pageType: Page['pageType'], draft?: boolean): Promise<Page> => {
+export const requireSitePage = async (
+  pageType: Page['pageType'],
+  draft?: boolean,
+): Promise<Page> => {
   const page = await getSitePage(pageType, draft)
 
   if (!page) {
