@@ -95,6 +95,8 @@
   --error: oklch(75% 0.15 25deg);
   --interaction-shadow: 0 12px 30px rgba(94, 62, 35, 0.12);
   --interaction-shadow-strong: 0 20px 44px rgba(94, 62, 35, 0.18);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 [data-theme='dark'] {
@@ -202,8 +204,8 @@ html[data-theme='light'] {
 /* Scroll reveal — state driven by data-reveal attribute, animations on compositor thread */
 [data-reveal] {
   transition:
-    opacity 0.5s cubic-bezier(0.21, 0.47, 0.32, 0.98),
-    transform 0.5s cubic-bezier(0.21, 0.47, 0.32, 0.98);
+    opacity 220ms var(--ease-out),
+    transform 220ms var(--ease-out);
   transition-delay: var(--reveal-delay, 0s);
 }
 [data-reveal='hidden'] {
@@ -237,7 +239,11 @@ html[data-theme='light'] {
 
 .compliance7-dotline::after {
   background:
-    radial-gradient(circle at center, color-mix(in oklab, var(--color-accent) 58%, transparent) 0, transparent 60%),
+    radial-gradient(
+      circle at center,
+      color-mix(in oklab, var(--color-accent) 58%, transparent) 0,
+      transparent 60%
+    ),
     linear-gradient(90deg, transparent, rgba(176, 142, 97, 0.22), transparent);
   filter: blur(14px);
   opacity: 0.8;

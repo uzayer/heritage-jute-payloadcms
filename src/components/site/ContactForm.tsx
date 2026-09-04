@@ -130,7 +130,7 @@ export function ContactForm({
     <section className="py-16 md:py-20">
       <div className="container">
         <div className="mx-auto max-w-5xl">
-          <Reveal className="flex flex-col gap-4 text-left" direction="none">
+          <Reveal className="flex flex-col gap-4 text-left" direction="none" eager>
             <h1 className="text-3xl font-semibold tracking-tight text-pretty sm:text-4xl lg:text-5xl">{title}</h1>
             <p className="text-muted-foreground lg:text-xl lg:text-balance">{description}</p>
           </Reveal>

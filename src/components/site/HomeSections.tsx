@@ -39,7 +39,7 @@ export const HomeHero: React.FC<{ hero: Home['hero'] }> = ({ hero }) => (
         {hero.primaryAction?.url ? (
           <Action
             action={hero.primaryAction}
-            className="min-w-[13rem] rounded-full border-white/20 bg-white text-stone-900 shadow-[0_22px_44px_rgba(0,0,0,0.18)] hover:bg-white/96 hover:shadow-[0_28px_54px_rgba(0,0,0,0.22)] focus-visible:ring-white/60 focus-visible:ring-offset-0"
+            className="min-w-[13rem] rounded-full border-white/20 bg-white text-stone-900 shadow-[0_22px_44px_rgba(0,0,0,0.18)] [@media(hover:hover)_and_(pointer:fine)]:hover:bg-white/96 [@media(hover:hover)_and_(pointer:fine)]:hover:shadow-[0_28px_54px_rgba(0,0,0,0.22)] focus-visible:ring-white/60 focus-visible:ring-offset-0"
           >
             <ArrowRight aria-hidden className="size-4" />
           </Action>
@@ -47,7 +47,7 @@ export const HomeHero: React.FC<{ hero: Home['hero'] }> = ({ hero }) => (
         {hero.secondaryAction?.url ? (
           <Action
             action={hero.secondaryAction}
-            className="min-w-[13rem] rounded-full border-white/35 bg-white/12 text-white shadow-[0_12px_28px_rgba(0,0,0,0.14)] hover:border-white/50 hover:bg-white/18 hover:text-white focus-visible:ring-white/55 focus-visible:ring-offset-0"
+            className="min-w-[13rem] rounded-full border-white/35 bg-white/12 text-white shadow-[0_12px_28px_rgba(0,0,0,0.14)] [@media(hover:hover)_and_(pointer:fine)]:hover:border-white/50 [@media(hover:hover)_and_(pointer:fine)]:hover:bg-white/18 [@media(hover:hover)_and_(pointer:fine)]:hover:text-white focus-visible:ring-white/55 focus-visible:ring-offset-0"
             variant="outline"
           >
             <MessageCircleMore aria-hidden className="size-4" />

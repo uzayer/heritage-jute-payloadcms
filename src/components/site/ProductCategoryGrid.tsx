@@ -67,19 +67,27 @@ export const ProductCategoryGrid: React.FC<{
 
   const sections = CATEGORIES.flatMap((category) => {
     const categoryProducts = productsByCategory.get(category.name)
-    return categoryProducts && categoryProducts.length > 0 ? [{ category, products: categoryProducts }] : []
+    return categoryProducts && categoryProducts.length > 0
+      ? [{ category, products: categoryProducts }]
+      : []
   })
 
   return (
     <section>
       <div className="border-muted-foreground/20">
         <div className="container mx-auto border-x border-muted-foreground/20 py-32">
-          <Reveal className="mb-9 lg:mb-14 lg:max-w-3xl" direction="none">
+          <Reveal className="mb-9 lg:mb-14 lg:max-w-3xl" direction="none" eager>
             <h2 className="mb-3 text-3xl font-semibold tracking-tight text-balance md:mb-4 md:text-4xl lg:mb-6">
               {heading}
             </h2>
             <p className="mb-8 text-muted-foreground lg:text-lg">{intro}</p>
-            <a className={cn(textLinkVariants({ tone: 'primary' }), 'font-medium md:text-base lg:text-lg')} href={catalogButtonHref}>
+            <a
+              className={cn(
+                textLinkVariants({ tone: 'primary' }),
+                'font-medium md:text-base lg:text-lg',
+              )}
+              href={catalogButtonHref}
+            >
               <span data-slot="link-label">{catalogButtonLabel}</span>
               <ArrowRight data-slot="link-icon" />
             </a>
@@ -89,10 +97,17 @@ export const ProductCategoryGrid: React.FC<{
             {sections.map(({ category, products: categoryProducts }) => (
               <div id={category.id} key={category.id}>
                 <div className="mb-6 max-w-2xl">
-                  <h3 className="text-xl font-semibold tracking-tight md:text-2xl">{category.name}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground md:text-base">{category.description}</p>
+                  <h3 className="text-xl font-semibold tracking-tight md:text-2xl">
+                    {category.name}
+                  </h3>
+                  <p className="mt-2 text-sm text-muted-foreground md:text-base">
+                    {category.description}
+                  </p>
                 </div>
-                <Reveal className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" stagger={0.05}>
+                <Reveal
+                  className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+                  stagger={0.05}
+                >
                   {categoryProducts.map((product) => (
                     <Link
                       className={cn(interactiveCardClassName, 'flex flex-col overflow-clip')}
@@ -101,13 +116,15 @@ export const ProductCategoryGrid: React.FC<{
                     >
                       <div className="group relative aspect-4/3 overflow-hidden rounded-t-[1.25rem]">
                         <MediaImage
-                          className="absolute inset-0 size-full object-cover object-top transition-[transform,opacity] duration-300 group-hover:scale-[1.03] group-hover:opacity-88 motion-reduce:transition-none motion-reduce:transform-none"
+                          className="absolute inset-0 size-full object-cover object-top transition-[transform,opacity] duration-200 [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-[1.03] [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-88 motion-reduce:transition-none motion-reduce:transform-none"
                           media={product.image}
                         />
                       </div>
                       <div className="flex flex-1 flex-col px-5 pt-6 pb-6 md:px-6 md:pb-7 lg:px-8 lg:pb-8">
                         <h4 className="mb-2 text-base font-semibold md:text-lg">{product.name}</h4>
-                        <p className="text-sm text-muted-foreground md:text-base">{product.shortDescription}</p>
+                        <p className="text-sm text-muted-foreground md:text-base">
+                          {product.shortDescription}
+                        </p>
                       </div>
                     </Link>
                   ))}
