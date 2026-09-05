@@ -2,7 +2,7 @@ import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
-import type { Product } from '@/payload-types'
+import type { Product, ProductCategory } from '@/payload-types'
 
 import { Reveal } from '@/components/motion/reveal'
 import { textLinkVariants, interactiveCardClassName } from '@/components/ui/interactive'
@@ -10,63 +10,29 @@ import { cn } from '@/utilities/ui'
 
 import { MediaImage } from './MediaImage'
 
-/**
- * The real product taxonomy. Astro's CloudCannon-editable `categories.json`
- * has no CMS equivalent yet — this mirrors that file's current content so
- * the catalogue groups and reads exactly as it does on the live site.
- */
-const CATEGORIES: { id: string; name: string; description: string }[] = [
-  {
-    id: 'raw-materials',
-    name: 'Raw Materials',
-    description:
-      'Raw jute, jute sliver (Tossa), and cut jute fiber. Multiple grades: BTD, BTC, BTR, BWD, BWC. Supplied in pressed bales, by the container load.',
-  },
-  {
-    id: 'yarn',
-    name: 'Yarn',
-    description:
-      'Jute yarn in 8–96 lbs count range, single or multi-ply. Qualities: Sacking, Hessian, CB, CRM, CTR, CRX, White (Mesta). Natural, bleached, or dyed.',
-  },
-  {
-    id: 'fabrics-cloth',
-    name: 'Fabrics & Cloth',
-    description:
-      'Hessian cloth (burlap) and sacking cloth in 24–52 inch widths, 200–305 GSM. Pressed bales of 500–2,000 yards. FOB Chittagong.',
-  },
-  {
-    id: 'bags-packaging',
-    name: 'Bags & Packaging',
-    description:
-      'Hessian bags, sacking sacks, and general jute bags for grain, coffee, cocoa, and agricultural storage. Custom dimensions and private labeling available.',
-  },
-  {
-    id: 'rope-twine',
-    name: 'Rope & Twine',
-    description:
-      'Jute rope in 6–42 mm diameter and jute twine for packaging, tying, and gardening. Packed 25 kg per roll, 4–6 rolls per unit.',
-  },
-]
-
 export const ProductCategoryGrid: React.FC<{
   heading: string
   intro: string
   catalogButtonLabel: string
   catalogButtonHref: string
+  categories: ProductCategory[]
   products: Product[]
-}> = ({ heading, intro, catalogButtonLabel, catalogButtonHref, products }) => {
-  const productsByCategory = new Map<string, Product[]>()
+}> = ({ heading, intro, catalogButtonLabel, catalogButtonHref, categories, products }) => {
+  // Products carry a relationship to a category document, so grouping keys off the
+  // category's id rather than a string that has to match its name character for character.
+  const productsByCategory = new Map<number, Product[]>()
   for (const product of products) {
-    const existing = productsByCategory.get(product.category)
+    const categoryId = typeof product.category === 'object' ? product.category.id : product.category
+    const existing = productsByCategory.get(categoryId)
     if (existing) {
       existing.push(product)
     } else {
-      productsByCategory.set(product.category, [product])
+      productsByCategory.set(categoryId, [product])
     }
   }
 
-  const sections = CATEGORIES.flatMap((category) => {
-    const categoryProducts = productsByCategory.get(category.name)
+  const sections = categories.flatMap((category) => {
+    const categoryProducts = productsByCategory.get(category.id)
     return categoryProducts && categoryProducts.length > 0
       ? [{ category, products: categoryProducts }]
       : []
@@ -95,10 +61,10 @@ export const ProductCategoryGrid: React.FC<{
 
           <div className="flex flex-col gap-14">
             {sections.map(({ category, products: categoryProducts }) => (
-              <div id={category.id} key={category.id}>
+              <div id={category.slug ?? undefined} key={category.id}>
                 <div className="mb-6 max-w-2xl">
                   <h3 className="text-xl font-semibold tracking-tight md:text-2xl">
-                    {category.name}
+                    {category.title}
                   </h3>
                   <p className="mt-2 text-sm text-muted-foreground md:text-base">
                     {category.description}

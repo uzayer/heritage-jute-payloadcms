@@ -19,6 +19,19 @@ const findPublishedProducts = async () => {
   })
 }
 
+const findProductCategories = async () => {
+  const payload = await getPayload({ config })
+
+  return payload.find({
+    collection: 'product-categories',
+    depth: 0,
+    limit: 100,
+    overrideAccess: false,
+    pagination: false,
+    sort: 'order',
+  })
+}
+
 const findProductBySlug = async (slug: string, draft: boolean) => {
   const payload = await getPayload({ config })
   const products = await payload.find({
@@ -47,6 +60,10 @@ const getCachedPublishedProducts = unstable_cache(findPublishedProducts, ['publi
   tags: ['products'],
 })
 
+const getCachedProductCategories = unstable_cache(findProductCategories, ['product-categories'], {
+  tags: ['product-categories'],
+})
+
 const getCachedPublishedProductBySlug = unstable_cache(
   (slug: string) => findProductBySlug(slug, false),
   ['published-product-by-slug'],
@@ -54,6 +71,7 @@ const getCachedPublishedProductBySlug = unstable_cache(
 )
 
 export const getPublishedProducts = cache(getCachedPublishedProducts)
+export const getProductCategories = cache(getCachedProductCategories)
 export const getProductBySlug = cache(async (slug: string, draft?: boolean) => {
   const isDraft = draft ?? (await draftMode()).isEnabled
 

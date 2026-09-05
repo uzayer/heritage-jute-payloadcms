@@ -12,6 +12,7 @@ import {
   resolveSourceDirectory,
   upsertMediaAsset,
 } from './source'
+import { SHARED_TRADE_TERMS } from './tradeTerms'
 
 /**
  * Imports the Shared Site Content and the fixed Site Pages from the current Astro
@@ -315,6 +316,7 @@ export async function importMarketingSite(payload: Payload, options: ImportOptio
         url: link.url,
       })),
       summary: `Government-certified jute exporter based in ${site.address.locality}, Bangladesh. Established ${site.established_year}. Supplying 31 countries across 6 continents.`,
+      tradeTerms: SHARED_TRADE_TERMS,
       website: site.web,
       whatsappUrl: site.whatsapp_url,
     },

@@ -17,6 +17,9 @@ import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c08
 import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { SlugField as SlugField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
+import { OverviewRowLabel as OverviewRowLabel_602181e9d445b98d48bce238807017cb } from '@/components/admin/RowLabels'
+import { SpecificationRowLabel as SpecificationRowLabel_602181e9d445b98d48bce238807017cb } from '@/components/admin/RowLabels'
+import { NamedRowLabel as NamedRowLabel_602181e9d445b98d48bce238807017cb } from '@/components/admin/RowLabels'
 import { FolderTableCell as FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { FolderField as FolderField_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
@@ -48,6 +51,9 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/next/client#SlugField": SlugField_2b8867833a34864a02ddf429b0728a40,
+  "@/components/admin/RowLabels#OverviewRowLabel": OverviewRowLabel_602181e9d445b98d48bce238807017cb,
+  "@/components/admin/RowLabels#SpecificationRowLabel": SpecificationRowLabel_602181e9d445b98d48bce238807017cb,
+  "@/components/admin/RowLabels#NamedRowLabel": NamedRowLabel_602181e9d445b98d48bce238807017cb,
   "@payloadcms/next/rsc#FolderTableCell": FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/next/rsc#FolderField": FolderField_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,

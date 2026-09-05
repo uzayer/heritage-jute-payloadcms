@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url'
 import 'dotenv/config'
 
 import config from '@payload-config'
+import { importProductCategories } from './productCategories'
 
 const juteRopeImage = {
   alt: 'Coiled jute ropes',
@@ -15,9 +16,10 @@ const onePixelPng = Buffer.from(
   'base64',
 )
 
+const juteRopeCategoryTitle = 'Rope & Twine'
+
 const juteRope = {
   _status: 'published' as const,
-  category: 'Rope & Twine',
   shortDescription:
     'Natural jute rope from 6 mm to 42 mm for packaging, tying, gardening, bundling, and industrial utility use.',
   name: 'Jute Rope',
@@ -33,33 +35,32 @@ const juteRope = {
     },
   ],
   applications: [
-    { item: 'Packaging and bundling' },
-    { item: 'Agricultural tying' },
-    { item: 'Gardening and nursery use' },
-    { item: 'Warehouse and industrial utility binding' },
+    'Packaging and bundling',
+    'Agricultural tying',
+    'Gardening and nursery use',
+    'Warehouse and industrial utility binding',
   ],
   buyerChecklist: [
-    { item: 'Select required diameter in millimeters.' },
-    { item: 'Confirm roll weight and cover packing.' },
-    { item: "Match tonnage to 20' or 40' container program." },
+    'Select required diameter in millimeters.',
+    'Confirm roll weight and cover packing.',
+    "Match tonnage to 20' or 40' container program.",
   ],
   customization: [
-    { item: '6 mm to 42 mm thickness' },
-    { item: '25 kg roll or buyer-specified roll weight' },
-    { item: 'Jute-fabric covered bundle packing' },
+    '6 mm to 42 mm thickness',
+    '25 kg roll or buyer-specified roll weight',
+    'Jute-fabric covered bundle packing',
   ],
   specificationGroups: [
     {
       name: 'Product Identity',
       specifications: [
-        { label: 'Thickness', value: '6-42 mm', highlight: true },
+        { label: 'Thickness', value: '6 mm to 42 mm', highlight: true },
         { label: 'Package', value: '25 kg roll', highlight: true },
         { label: "20' FCL", value: '13 MT', highlight: true },
         { label: "40' FCL", value: '24-26 MT', highlight: true },
         { label: 'Product Type', value: 'Jute rope', highlight: true },
         { label: 'Material', value: 'Twisted natural jute fiber', highlight: false },
         { label: 'Qualities', value: 'Sacking, Hessian, CB', highlight: false },
-        { label: 'Thickness', value: '6 mm to 42 mm', highlight: true },
         { label: 'HS Code', value: '5607.90.90', highlight: false },
       ],
     },
@@ -70,13 +71,6 @@ const juteRope = {
         { label: 'Packing', value: '4-6 rolls covered with jute fabric', highlight: true },
         { label: "20' FCL", value: '13 MT', highlight: false },
         { label: "40' FCL", value: '24-26 MT', highlight: false },
-        { label: 'Origin', value: 'Made in Bangladesh', highlight: true },
-        { label: 'Port of Loading', value: 'Chittagong (CTG), Bangladesh', highlight: false },
-        { label: 'Incoterms', value: 'FOB, CFR, CIF, EXW', highlight: false },
-        { label: 'Payment Terms', value: 'LC at Sight, T/T, CAD', highlight: false },
-        { label: 'Sample Lead Time', value: '5–7 days', highlight: false },
-        { label: 'Bulk Lead Time', value: '3–6 weeks from order confirmation', highlight: false },
-        { label: 'Export Basis', value: 'Container-load supply', highlight: false },
       ],
     },
   ],
@@ -112,7 +106,12 @@ export async function importJuteRope(payload: Payload) {
     where: { slug: { equals: juteRope.slug } },
   })
 
-  const data = { ...juteRope, image: media.id }
+  const categories = await importProductCategories(payload)
+  const category = categories.find((each) => each.title === juteRopeCategoryTitle)
+
+  if (!category) throw new Error(`categories.json has no "${juteRopeCategoryTitle}" category.`)
+
+  const data = { ...juteRope, category: category.id, image: media.id }
   const product = existingProduct.docs[0]
 
   if (product) {
@@ -130,7 +129,7 @@ export async function importJuteRope(payload: Payload) {
 async function runImport(): Promise<void> {
   const payload = await getPayload({ config })
   const product = await importJuteRope(payload)
-  payload.logger.info(`Imported Product: ${product.name} (${product.slug})`)
+  payload.logger.info(`Imported Product: ${juteRope.name} (${juteRope.slug}) as #${product.id}`)
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

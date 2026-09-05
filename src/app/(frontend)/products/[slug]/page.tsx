@@ -9,6 +9,7 @@ import { MediaImage } from '@/components/site/MediaImage'
 import { ProductHeroSpecs, ProductSpecsSection } from '@/components/site/ProductSpecs'
 import { buttonVariants } from '@/components/ui/button'
 import { textLinkVariants } from '@/components/ui/interactive'
+import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getProductBySlug, getPublishedProducts } from '@/utilities/products'
 import { buildBreadcrumbListLd, buildProductLd, JsonLd } from '@/utilities/structuredData'
 
@@ -40,7 +41,9 @@ export default async function ProductDetailPage({ params }: Args) {
 
   if (!product) notFound()
 
+  const company = await getCachedGlobal('company')()
   const quoteHref = `/contact?product=${encodeURIComponent(product.name)}`
+  const categoryTitle = typeof product.category === 'object' ? product.category.title : null
 
   return (
     <main className="bg-background text-foreground">
@@ -61,7 +64,7 @@ export default async function ProductDetailPage({ params }: Args) {
                 <Link className={textLinkVariants({ tone: 'muted' })} href="/products">
                   <span data-slot="link-label">Products</span>
                 </Link>{' '}
-                / {product.category}
+                {categoryTitle ? ` / ${categoryTitle}` : null}
               </div>
               <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">{product.name}</h1>
               <p className="mt-4 text-lg text-muted-foreground">{product.shortDescription}</p>
@@ -110,14 +113,11 @@ export default async function ProductDetailPage({ params }: Args) {
               </p>
               <ul className="mt-4 space-y-3">
                 {product.buyerChecklist?.map((note) => (
-                  <li
-                    className="flex gap-2.5 text-sm leading-6 text-muted-foreground"
-                    key={note.id ?? note.item}
-                  >
+                  <li className="flex gap-2.5 text-sm leading-6 text-muted-foreground" key={note}>
                     <span aria-hidden className="mt-0.5 text-emerald-600">
                       ✓
                     </span>
-                    <span>{note.item}</span>
+                    <span>{note}</span>
                   </li>
                 ))}
               </ul>
@@ -129,7 +129,7 @@ export default async function ProductDetailPage({ params }: Args) {
               <h2 className="text-xl font-semibold tracking-tight">Common Applications</h2>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-muted-foreground">
                 {product.applications?.map((application) => (
-                  <li key={application.id ?? application.item}>{application.item}</li>
+                  <li key={application}>{application}</li>
                 ))}
               </ul>
             </div>
@@ -140,7 +140,7 @@ export default async function ProductDetailPage({ params }: Args) {
                 </h2>
                 <ul className="mt-4 space-y-3 text-sm leading-6 text-muted-foreground">
                   {product.customization.map((item) => (
-                    <li key={item.id ?? item.item}>{item.item}</li>
+                    <li key={item}>{item}</li>
                   ))}
                 </ul>
               </div>
@@ -151,6 +151,7 @@ export default async function ProductDetailPage({ params }: Args) {
 
       <ProductSpecsSection
         specificationGroups={product.specificationGroups}
+        tradeTerms={company.tradeTerms}
         variants={product.variants}
       />
 

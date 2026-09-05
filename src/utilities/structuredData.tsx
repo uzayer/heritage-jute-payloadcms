@@ -90,7 +90,7 @@ export const buildProductLd = (product: Product) => ({
   '@context': 'https://schema.org',
   '@type': 'Product',
   brand: { '@type': 'Brand', name: 'Heritage Jute Fibers' },
-  category: product.category,
+  category: typeof product.category === 'object' ? product.category.title : undefined,
   description: product.shortDescription,
   image: absoluteMediaUrl(product.image),
   name: product.name,

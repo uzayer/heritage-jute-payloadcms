@@ -1,6 +1,6 @@
 import React from 'react'
 
-import type { Product } from '@/payload-types'
+import type { Company, Product } from '@/payload-types'
 
 import { Reveal } from '@/components/motion/reveal'
 import { Badge } from '@/components/ui/badge'
@@ -9,6 +9,16 @@ import { cn } from '@/utilities/ui'
 type SpecificationGroup = NonNullable<Product['specificationGroups']>[number]
 type Variant = NonNullable<Product['variants']>[number]
 type Specification = NonNullable<SpecificationGroup['specifications']>[number]
+type TradeTerm = NonNullable<Company['tradeTerms']>[number]
+
+/**
+ * Incoterms, payment terms, lead times and port of loading are the same on every
+ * product, so they are held once on the Company global rather than re-entered on each
+ * product. They render as a final card alongside the product's own groups.
+ */
+const TRADE_TERMS_HEADING = 'Trade Terms'
+const TRADE_TERMS_DESCRIPTION =
+  'The same on every Heritage Jute order. Confirmed on the proforma invoice.'
 
 const SpecRow: React.FC<{ spec: Specification }> = ({ spec }) => (
   <div
@@ -50,7 +60,10 @@ export const ProductHeroSpecs: React.FC<{ specificationGroups?: SpecificationGro
   ) : null
 }
 
-const SpecGroupsGrid: React.FC<{ specificationGroups: SpecificationGroup[] }> = ({ specificationGroups }) => (
+const SpecGroupsGrid: React.FC<{
+  specificationGroups: SpecificationGroup[]
+  tradeTerms: TradeTerm[]
+}> = ({ specificationGroups, tradeTerms }) => (
   <Reveal className="mt-10 grid gap-5 lg:grid-cols-2" stagger={0.03} staggerDelay={0.05}>
     {specificationGroups.map((group) => (
       <article className="h-full overflow-hidden rounded-lg border border-border bg-background" key={group.id ?? group.name}>
@@ -63,6 +76,19 @@ const SpecGroupsGrid: React.FC<{ specificationGroups: SpecificationGroup[] }> = 
         </div>
       </article>
     ))}
+    {tradeTerms.length > 0 ? (
+      <article className="h-full overflow-hidden rounded-lg border border-border bg-background">
+        <div className="border-b border-border bg-muted/20 px-5 py-4">
+          <h3 className="text-lg font-semibold tracking-tight">{TRADE_TERMS_HEADING}</h3>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">{TRADE_TERMS_DESCRIPTION}</p>
+        </div>
+        <div className="divide-y divide-border">
+          {tradeTerms.map((term) => (
+            <SpecRow key={term.id ?? term.label} spec={{ label: term.label, value: term.value }} />
+          ))}
+        </div>
+      </article>
+    ) : null}
   </Reveal>
 )
 
@@ -98,8 +124,9 @@ const VariantsGrid: React.FC<{ variants: Variant[] }> = ({ variants }) => (
 /** The technical "Export Sheet" section: spec-group cards plus, when present, buyer-selectable variants. */
 export const ProductSpecsSection: React.FC<{
   specificationGroups?: SpecificationGroup[] | null
+  tradeTerms?: TradeTerm[] | null
   variants?: Variant[] | null
-}> = ({ specificationGroups, variants }) => {
+}> = ({ specificationGroups, tradeTerms, variants }) => {
   const hasVariants = Boolean(variants && variants.length > 0)
 
   return (
@@ -119,7 +146,10 @@ export const ProductSpecsSection: React.FC<{
           </div>
         </Reveal>
 
-        <SpecGroupsGrid specificationGroups={specificationGroups ?? []} />
+        <SpecGroupsGrid
+          specificationGroups={specificationGroups ?? []}
+          tradeTerms={tradeTerms ?? []}
+        />
 
         {hasVariants ? <VariantsGrid variants={variants!} /> : null}
       </div>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 import { CallToActionSection } from '@/components/site/CallToActionSection'
 import { ProductCategoryGrid } from '@/components/site/ProductCategoryGrid'
-import { getPublishedProducts } from '@/utilities/products'
+import { getProductCategories, getPublishedProducts } from '@/utilities/products'
 import { buildItemListLd, JsonLd } from '@/utilities/structuredData'
 
 /**
@@ -34,7 +34,10 @@ export const metadata: Metadata = {
 }
 
 export default async function ProductsPage() {
-  const { docs: products } = await getPublishedProducts()
+  const [{ docs: products }, { docs: categories }] = await Promise.all([
+    getPublishedProducts(),
+    getProductCategories(),
+  ])
 
   return (
     <main className="bg-background text-foreground">
@@ -42,6 +45,7 @@ export default async function ProductsPage() {
       <ProductCategoryGrid
         catalogButtonHref={PAGE.catalogButtonHref}
         catalogButtonLabel={PAGE.catalogButtonLabel}
+        categories={categories}
         heading={PAGE.heading}
         intro={PAGE.intro}
         products={products}

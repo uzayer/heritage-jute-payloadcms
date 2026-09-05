@@ -70,6 +70,7 @@ export interface Config {
     pages: Page;
     posts: Post;
     products: Product;
+    'product-categories': ProductCategory;
     media: Media;
     categories: Category;
     users: User;
@@ -93,6 +94,7 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
+    'product-categories': ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -750,34 +752,45 @@ export interface User {
  */
 export interface Product {
   id: number;
-  name: string;
-  category: string;
-  shortDescription: string;
+  /**
+   * Decides which section of the catalogue page this product appears under.
+   */
+  category: number | ProductCategory;
+  /**
+   * Used on the catalogue card, the product hero, and link previews.
+   */
   image: number | Media;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  name: string;
+  /**
+   * One sentence. Shown under the product name, on the catalogue card, and as the search-result description.
+   */
+  shortDescription: string;
+  /**
+   * Rendered in order as the Product Overview section.
+   */
   overview?:
     | {
         paragraph: string;
         id?: string | null;
       }[]
     | null;
-  applications?:
-    | {
-        item: string;
-        id?: string | null;
-      }[]
-    | null;
-  buyerChecklist?:
-    | {
-        item: string;
-        id?: string | null;
-      }[]
-    | null;
-  customization?:
-    | {
-        item: string;
-        id?: string | null;
-      }[]
-    | null;
+  /**
+   * What buyers use this product for.
+   */
+  applications?: string[] | null;
+  /**
+   * What a buyer should settle before asking for a price.
+   */
+  buyerChecklist?: string[] | null;
+  /**
+   * What can be changed to order. Hidden when empty.
+   */
+  customization?: string[] | null;
   specificationGroups?:
     | {
         name: string;
@@ -786,6 +799,9 @@ export interface Product {
           | {
               label: string;
               value: string;
+              /**
+               * Shades this row in the specification table. The first four highlighted rows, in the order they appear here, also fill the summary strip under the product name.
+               */
               highlight?: boolean | null;
               id?: string | null;
             }[]
@@ -801,6 +817,9 @@ export interface Product {
           | {
               label: string;
               value: string;
+              /**
+               * Shades this row in the specification table. The first four highlighted rows, in the order they appear here, also fill the summary strip under the product name.
+               */
               highlight?: boolean | null;
               id?: string | null;
             }[]
@@ -808,6 +827,28 @@ export interface Product {
         id?: string | null;
       }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-categories".
+ */
+export interface ProductCategory {
+  id: number;
+  /**
+   * The heading shown above this section on the catalogue page.
+   */
+  title: string;
+  /**
+   * One or two sentences below the heading. Shown only on the catalogue page.
+   */
+  description: string;
+  /**
+   * Sections run low to high on the catalogue page.
+   */
+  order: number;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -815,7 +856,6 @@ export interface Product {
   slug: string;
   updatedAt: string;
   createdAt: string;
-  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1183,6 +1223,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'products';
         value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'product-categories';
+        value: number | ProductCategory;
       } | null)
     | ({
         relationTo: 'media';
@@ -1605,34 +1649,21 @@ export interface PostsSelect<T extends boolean = true> {
  * via the `definition` "products_select".
  */
 export interface ProductsSelect<T extends boolean = true> {
-  name?: T;
   category?: T;
-  shortDescription?: T;
   image?: T;
+  generateSlug?: T;
+  slug?: T;
+  name?: T;
+  shortDescription?: T;
   overview?:
     | T
     | {
         paragraph?: T;
         id?: T;
       };
-  applications?:
-    | T
-    | {
-        item?: T;
-        id?: T;
-      };
-  buyerChecklist?:
-    | T
-    | {
-        item?: T;
-        id?: T;
-      };
-  customization?:
-    | T
-    | {
-        item?: T;
-        id?: T;
-      };
+  applications?: T;
+  buyerChecklist?: T;
+  customization?: T;
   specificationGroups?:
     | T
     | {
@@ -1663,11 +1694,22 @@ export interface ProductsSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-categories_select".
+ */
+export interface ProductCategoriesSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  order?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;
   createdAt?: T;
-  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2206,6 +2248,16 @@ export interface Company {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Terms that are the same for every product — Incoterms, payment, lead times, port of loading. These were repeated on all eleven product documents; they are written down once here and appended to every product specification sheet.
+   */
+  tradeTerms?:
+    | {
+        label: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2305,6 +2357,13 @@ export interface CompanySelect<T extends boolean = true> {
     | {
         network?: T;
         url?: T;
+        id?: T;
+      };
+  tradeTerms?:
+    | T
+    | {
+        label?: T;
+        value?: T;
         id?: T;
       };
   updatedAt?: T;

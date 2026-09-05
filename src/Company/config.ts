@@ -78,6 +78,25 @@ export const Company: GlobalConfig = {
         { name: 'url', type: 'text', required: true },
       ],
     },
+    {
+      name: 'tradeTerms',
+      type: 'array',
+      labels: { singular: 'Trade term', plural: 'Trade terms' },
+      admin: {
+        components: { RowLabel: '@/components/admin/RowLabels#SpecificationRowLabel' },
+        description:
+          'Terms that are the same for every product — Incoterms, payment, lead times, port of loading. These were repeated on all eleven product documents; they are written down once here and appended to every product specification sheet.',
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            { name: 'label', type: 'text', required: true, admin: { width: '40%' } },
+            { name: 'value', type: 'text', required: true, admin: { width: '60%' } },
+          ],
+        },
+      ],
+    },
   ],
   hooks: { afterChange: [revalidateCompany] },
 }
