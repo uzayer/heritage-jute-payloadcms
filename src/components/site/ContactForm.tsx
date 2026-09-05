@@ -11,7 +11,13 @@ import { Reveal } from '@/components/motion/reveal'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { iconButtonVariants } from '@/components/ui/interactive'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/utilities/ui'
 
@@ -131,7 +137,9 @@ export function ContactForm({
       <div className="container">
         <div className="mx-auto max-w-5xl">
           <Reveal className="flex flex-col gap-4 text-left" direction="none" eager>
-            <h1 className="text-3xl font-semibold tracking-tight text-pretty sm:text-4xl lg:text-5xl">{title}</h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-pretty sm:text-4xl lg:text-5xl">
+              {title}
+            </h1>
             <p className="text-muted-foreground lg:text-xl lg:text-balance">{description}</p>
           </Reveal>
 
@@ -139,7 +147,9 @@ export function ContactForm({
             <div className="space-y-10 md:pr-10">
               <Reveal direction="none" delay={0.05}>
                 <div>
-                  <h2 className="text-lg font-semibold tracking-tight text-balance">{corporateHeading}</h2>
+                  <h2 className="text-lg font-semibold tracking-tight text-balance">
+                    {corporateHeading}
+                  </h2>
                   <p className="mt-3 font-medium tracking-tight text-muted-foreground">
                     {addressLine1}
                     <br />
@@ -150,7 +160,9 @@ export function ContactForm({
 
               <Reveal delay={0.1}>
                 <div>
-                  <h2 className="text-lg font-semibold tracking-tight text-balance">{contactHeading}</h2>
+                  <h2 className="text-lg font-semibold tracking-tight text-balance">
+                    {contactHeading}
+                  </h2>
                   <div className="mt-3 flex flex-col gap-6">
                     <a
                       className="group/link flex items-center gap-3 font-medium tracking-tight text-muted-foreground hover:text-foreground"
@@ -183,7 +195,9 @@ export function ContactForm({
               {socialLinks.length > 0 ? (
                 <Reveal delay={0.15}>
                   <div>
-                    <h2 className="text-lg font-semibold tracking-tight text-balance">{socialHeading}</h2>
+                    <h2 className="text-lg font-semibold tracking-tight text-balance">
+                      {socialHeading}
+                    </h2>
                     <div className="mt-3 flex gap-6">
                       {socialLinks.map((link) => (
                         <a
@@ -211,7 +225,9 @@ export function ContactForm({
 
               {isSubmitted ? (
                 <div className="mt-5 rounded-lg border border-green-500/20 bg-green-500/10 p-4 text-center">
-                  <p className="text-sm font-medium text-green-600 dark:text-green-400">{successMessage}</p>
+                  <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                    {successMessage}
+                  </p>
                 </div>
               ) : null}
 
@@ -225,7 +241,13 @@ export function ContactForm({
                         <FieldLabel htmlFor={field.name}>
                           Full name <span className="text-destructive">*</span>
                         </FieldLabel>
-                        <Input {...field} id={field.name} aria-invalid={fieldState.invalid} placeholder="Jordan Rivera" className="bg-background" />
+                        <Input
+                          {...field}
+                          id={field.name}
+                          aria-invalid={fieldState.invalid}
+                          placeholder="Jordan Rivera"
+                          className="bg-background"
+                        />
                         {fieldState.invalid ? <FieldError errors={[fieldState.error]} /> : null}
                       </Field>
                     )}
@@ -258,7 +280,12 @@ export function ContactForm({
                     render={({ field }) => (
                       <Field>
                         <FieldLabel htmlFor={field.name}>Company name</FieldLabel>
-                        <Input {...field} id={field.name} placeholder="Optional" className="bg-background" />
+                        <Input
+                          {...field}
+                          id={field.name}
+                          placeholder="Optional"
+                          className="bg-background"
+                        />
                       </Field>
                     )}
                   />
@@ -330,7 +357,12 @@ export function ContactForm({
                     render={({ field }) => (
                       <Field>
                         <FieldLabel htmlFor={field.name}>Country of destination</FieldLabel>
-                        <Input {...field} id={field.name} placeholder="e.g. Germany, UAE, USA" className="bg-background" />
+                        <Input
+                          {...field}
+                          id={field.name}
+                          placeholder="e.g. Germany, UAE, USA"
+                          className="bg-background"
+                        />
                       </Field>
                     )}
                   />
@@ -355,11 +387,15 @@ export function ContactForm({
                     )}
                   />
 
-                  {submitError !== null ? <p className="text-sm text-destructive">{submitError}</p> : null}
+                  {submitError !== null ? (
+                    <p className="text-sm text-destructive">{submitError}</p>
+                  ) : null}
 
                   <div className="flex justify-end">
                     <Button type="submit" size="lg" disabled={form.formState.isSubmitting}>
-                      {form.formState.isSubmitting ? <LoaderIcon className="size-4 animate-spin" aria-hidden /> : null}
+                      {form.formState.isSubmitting ? (
+                        <LoaderIcon className="size-4 animate-spin" aria-hidden />
+                      ) : null}
                       {form.formState.isSubmitting ? submittingLabel : submitLabel}
                     </Button>
                   </div>

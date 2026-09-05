@@ -4,7 +4,12 @@ import React from 'react'
 
 import type { Page } from '@/payload-types'
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 import { buttonVariants } from '@/components/ui/button'
 import { Reveal } from '@/components/motion/reveal'
 import { cn } from '@/utilities/ui'
@@ -58,7 +63,9 @@ export const HomeHero: React.FC<{ hero: Home['hero'] }> = ({ hero }) => (
   </section>
 )
 
-export const HomeProductRange: React.FC<{ productRange: Home['productRange'] }> = ({ productRange }) => (
+export const HomeProductRange: React.FC<{ productRange: Home['productRange'] }> = ({
+  productRange,
+}) => (
   <section>
     <div className="border-t">
       <div>
@@ -86,20 +93,24 @@ export const HomeProductRange: React.FC<{ productRange: Home['productRange'] }> 
         </div>
         <div className="border-t border-muted-foreground/20">
           <div className="container border-x border-muted-foreground/20 px-0">
-            <Reveal className="grid gap-px bg-muted-foreground/20 md:grid-cols-2 lg:grid-cols-3" stagger={0.06}>
+            <div className="grid gap-px bg-muted-foreground/20 md:grid-cols-2 lg:grid-cols-3">
               {productRange.items?.map((item) => (
                 <div
                   className="flex gap-4 bg-muted px-6 pt-8 pb-8 md:flex-col md:gap-0 md:px-8 md:pt-16"
                   key={item.id ?? item.title}
                 >
-                  <SectionIcon className="size-7 shrink-0 md:size-8" name={item.icon} strokeWidth={1.5} />
+                  <SectionIcon
+                    className="size-7 shrink-0 md:size-8"
+                    name={item.icon}
+                    strokeWidth={1.5}
+                  />
                   <div>
                     <h3 className="mb-2 md:mt-6 md:text-lg">{item.title}</h3>
                     <p className="text-muted-foreground">{item.description}</p>
                   </div>
                 </div>
               ))}
-            </Reveal>
+            </div>
           </div>
         </div>
         <div>
@@ -112,7 +123,9 @@ export const HomeProductRange: React.FC<{ productRange: Home['productRange'] }> 
   </section>
 )
 
-export const HomeGlobalReach: React.FC<{ globalReach: Home['globalReach'] }> = ({ globalReach }) => (
+export const HomeGlobalReach: React.FC<{ globalReach: Home['globalReach'] }> = ({
+  globalReach,
+}) => (
   <section className="@container">
     <div className="border-t border-muted-foreground/20">
       <div className="container border-x border-muted-foreground/20 py-12 md:py-20">
@@ -133,10 +146,16 @@ export const HomeGlobalReach: React.FC<{ globalReach: Home['globalReach'] }> = (
             <span className="@2xl:block bg-border pointer-events-none absolute inset-y-4 left-2/3 hidden w-px" />
             <div className="**:text-center @max-2xl:max-w-2xs @max-2xl:mx-auto @max-2xl:gap-6 @2xl:grid-cols-3 grid *:px-6">
               {globalReach.stats?.map((stat, index) => (
-                <Reveal className="space-y-4 *:block" delay={index * 0.05} key={stat.id ?? stat.value}>
+                <Reveal
+                  className="space-y-4 *:block"
+                  delay={index * 0.05}
+                  key={stat.id ?? stat.value}
+                >
                   <span className="text-5xl font-semibold">
                     {stat.value}{' '}
-                    {stat.suffix ? <span className="text-2xl text-muted-foreground">{stat.suffix}</span> : null}
+                    {stat.suffix ? (
+                      <span className="text-2xl text-muted-foreground">{stat.suffix}</span>
+                    ) : null}
                   </span>
                   <p className="text-balance text-sm text-muted-foreground">
                     <strong className="font-medium text-foreground">{stat.descriptionLead}</strong>
@@ -169,7 +188,12 @@ export const HomeOrdering: React.FC<{ ordering: Home['ordering'] }> = ({ orderin
                 {ordering.secondParagraphSuffix}
               </p>
               {ordering.primaryAction?.url ? (
-                <Action action={ordering.primaryAction} className="gap-1 pr-1.5" size="sm" variant="secondary">
+                <Action
+                  action={ordering.primaryAction}
+                  className="gap-1 pr-1.5"
+                  size="sm"
+                  variant="secondary"
+                >
                   <ChevronRight className="size-3" />
                 </Action>
               ) : null}
@@ -185,8 +209,12 @@ export const HomeCountries: React.FC<{ countries: Home['countries'] }> = ({ coun
   <div className="border-t border-muted-foreground/20">
     <div className="container max-w-6xl border-x border-muted-foreground/20 py-16 md:py-20">
       <Reveal direction="none">
-        <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted-foreground">{countries.eyebrow}</p>
-        <h2 className="mt-3 text-2xl font-semibold tracking-tight md:text-3xl">{countries.heading}</h2>
+        <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          {countries.eyebrow}
+        </p>
+        <h2 className="mt-3 text-2xl font-semibold tracking-tight md:text-3xl">
+          {countries.heading}
+        </h2>
         <p className="mt-3 max-w-xl text-muted-foreground">{countries.description}</p>
       </Reveal>
 
@@ -198,7 +226,10 @@ export const HomeCountries: React.FC<{ countries: Home['countries'] }> = ({ coun
             </p>
             <div className="flex flex-wrap gap-x-5 gap-y-2">
               {region.countries?.map((country) => (
-                <span className="flex items-center gap-1.5 text-sm text-foreground" key={country.id ?? country.name}>
+                <span
+                  className="flex items-center gap-1.5 text-sm text-foreground"
+                  key={country.id ?? country.name}
+                >
                   <span aria-hidden className="text-base leading-none">
                     {country.flag}
                   </span>
@@ -219,7 +250,9 @@ export const HomeFaqs: React.FC<{ faqs: Home['faqs'] }> = ({ faqs }) => (
       <div className="container border-x border-muted-foreground/20 py-16 md:py-24">
         <div className="mx-auto max-w-5xl">
           <Reveal className="mx-auto max-w-xl text-center" direction="none">
-            <h2 className="text-balance text-3xl font-bold md:text-4xl lg:text-5xl">{faqs.heading}</h2>
+            <h2 className="text-balance text-3xl font-bold md:text-4xl lg:text-5xl">
+              {faqs.heading}
+            </h2>
             <p className="mt-4 text-balance text-muted-foreground">{faqs.intro}</p>
           </Reveal>
 
@@ -232,7 +265,11 @@ export const HomeFaqs: React.FC<{ faqs: Home['faqs'] }> = ({ faqs }) => (
                 type="single"
               >
                 {faqs.items?.map((item) => (
-                  <AccordionItem className="border-dashed" key={item.id ?? item.question} value={item.id ?? item.question}>
+                  <AccordionItem
+                    className="border-dashed"
+                    key={item.id ?? item.question}
+                    value={item.id ?? item.question}
+                  >
                     <AccordionTrigger className="text-base">
                       <span className="flex-1 text-pretty">{item.question}</span>
                     </AccordionTrigger>

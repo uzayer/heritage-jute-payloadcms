@@ -3,7 +3,6 @@ import React from 'react'
 
 import { Action } from '@/components/site/Action'
 import { MediaImage } from '@/components/site/MediaImage'
-import { ThemeToggle } from '@/components/ThemeToggle'
 import { Navbar8Desktop } from '@/components/navbar8-desktop'
 import { Navbar8Mobile } from '@/components/navbar8-mobile'
 import { getCachedGlobal } from '@/utilities/getGlobals'
@@ -35,16 +34,17 @@ export async function Header() {
             )}
           </Link>
 
-          <nav aria-label="Main navigation" className="flex items-center gap-3.5">
+          <nav aria-label="Main navigation">
             <Navbar8Desktop navItems={navItems} />
-            <ThemeToggle />
+          </nav>
+          <div className="flex items-center gap-3.5">
             <Action
               action={{ label: header.ctaLabel, url: header.ctaUrl }}
               className="hidden h-10 rounded-[0.95rem] px-4 text-sm font-medium sm:inline-flex"
               size="sm"
             />
             <Navbar8Mobile mobileGroups={mobileGroups} socialLinks={socialLinks} />
-          </nav>
+          </div>
         </div>
       </div>
     </header>
