@@ -54,4 +54,6 @@ Both read the current Astro site from `HERITAGE_JUTE_SOURCE_DIR` (a sibling `her
 
 ## Verification
 
-Run `pnpm test:int` for the Payload Local API seam. Run `pnpm test:e2e` for the public browser seam; its desktop and mobile browser projects both use WebKit, our Safari baseline.
+This is a small single-client site with no automated test suite. Verify a change by running
+`pnpm dev` and walking the affected pages, and `pnpm build` before deploying — the build is
+what catches type errors and a route that fails to render.
