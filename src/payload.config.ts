@@ -50,6 +50,18 @@ export default buildConfig({
       // The `BeforeDashboard` component renders the 'welcome' block that you see after logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below.
       beforeDashboard: ['@/components/BeforeDashboard'],
+      graphics: {
+        Icon: '@/components/admin/Graphics#Icon',
+        Logo: '@/components/admin/Graphics#Logo',
+      },
+    },
+    meta: {
+      icons: [
+        { rel: 'icon', sizes: '32x32', type: 'image/png', url: '/icon-32.png' },
+        { rel: 'icon', sizes: '16x16', type: 'image/png', url: '/icon-16.png' },
+        { rel: 'apple-touch-icon', url: '/apple-icon.png' },
+      ],
+      titleSuffix: '— Heritage Jute Fibers',
     },
     importMap: {
       baseDir: path.resolve(dirname),

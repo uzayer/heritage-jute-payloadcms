@@ -27,8 +27,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html className={cn(GeistSans.variable, GeistMono.variable)} data-theme="light" lang="en">
       <head>
-        <link href="/favicon.ico" rel="icon" sizes="32x32" />
+        <link href="/favicon.ico" rel="icon" sizes="any" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        <link href="/icon-32.png" rel="icon" sizes="32x32" type="image/png" />
+        <link href="/icon-16.png" rel="icon" sizes="16x16" type="image/png" />
+        <link href="/apple-icon.png" rel="apple-touch-icon" />
+        <link href="/manifest.json" rel="manifest" />
       </head>
       <body>
         <JsonLd data={buildOrganizationLd(company, header.logo)} />

@@ -1,0 +1,21 @@
+{
+  "name": "Heritage Jute Fibers",
+  "short_name": "Heritage Jute",
+  "description": "Government-certified Bangladeshi jute exporter supplying raw jute, yarn, cloth, bags, and rope worldwide.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#774F2B",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
