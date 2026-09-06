@@ -15,7 +15,9 @@ Set the same variable names in Vercel, but never reuse their values between scop
 | Preview | dedicated development/preview database and token | dedicated development/preview bucket and public URL |
 | Production | production database and token | production bucket and public URL |
 
-Every Vercel scope needs `PAYLOAD_SECRET`, `DATABASE_URL`, `DATABASE_AUTH_TOKEN`, `NEXT_PUBLIC_SERVER_URL`, `CRON_SECRET`, `PREVIEW_SECRET`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT`, and `R2_PUBLIC_URL`. The application rejects a Vercel deployment missing its database or complete R2 configuration, preventing a deployment from silently using local storage.
+Every Vercel scope needs `PAYLOAD_SECRET`, `DATABASE_URL`, `DATABASE_AUTH_TOKEN`, `NEXT_PUBLIC_SERVER_URL`, `CRON_SECRET`, `PREVIEW_SECRET`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT`, `R2_PUBLIC_URL`, `RESEND_API_KEY`, and `RESEND_FROM_EMAIL`. The application rejects a Vercel deployment missing its database or complete R2 configuration, preventing a deployment from silently using local storage. There is no equivalent build-time guard for the Resend variables — an unset `RESEND_API_KEY` or `RESEND_FROM_EMAIL` only surfaces when a buyer submits the contact form and the inquiry fails to deliver.
+
+`RESEND_FROM_EMAIL` must be an address on a domain verified in the Resend dashboard — an unverified sender fails at send time, not at build time. The inquiry itself is addressed to the Company global's `email` field, so there is no separate recipient variable.
 
 `DATABASE_URL` is the Turso `libsql://` URL and `DATABASE_AUTH_TOKEN` is the corresponding Turso token. `R2_ENDPOINT` is the S3 API endpoint (`https://<account-id>.r2.cloudflarestorage.com`); it is for writes, while `R2_PUBLIC_URL` is the public custom domain used to serve Media Assets.
 

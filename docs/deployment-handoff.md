@@ -111,12 +111,12 @@ Needed: `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`,
   regardless — this only affects the admin panel and the dynamic sitemap/search routes.
 - **[CLAUDE]** Verify the deployed site and admin panel afterwards.
 
-Variables per `docs/platform-environments.md`, **plus one that doc omits**:
-
-⚠️ **`WEB3FORMS_ACCESS_KEY`** is absent from that list, but
-`src/app/(frontend)/contact/actions.ts` throws `"Contact form is not configured"` without
-it. The contact form breaks in production if unset. The user does not currently have this
-value in their local `.env` — it needs obtaining from Web3Forms.
+Variables per `docs/platform-environments.md`, including `RESEND_API_KEY` and
+`RESEND_FROM_EMAIL` — the contact form (`src/app/(frontend)/contact/actions.ts`) throws
+`"Contact form is not configured"` without both. `RESEND_FROM_EMAIL` also needs a domain
+verified in the Resend dashboard **[YOU]** before it will actually deliver; an unverified
+sender fails at submit time, not at build time, so this is easy to miss until someone
+tests the form. The user does not currently have a Resend account or API key.
 
 `src/payload.config.ts` hard-fails the build when `VERCEL` is set and `DATABASE_URL` or any
 R2 var is missing, so a misconfiguration surfaces at build time rather than silently

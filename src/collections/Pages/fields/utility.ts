@@ -2,7 +2,7 @@ import type { GroupField } from 'payload'
 
 import { forPageType, headingField, linkedList } from './shared'
 
-/** The Contact Site Page. The inquiry itself is delivered by Web3Forms, not stored here. */
+/** The Contact Site Page. The inquiry itself is delivered by Resend, not stored here. */
 export const contact: GroupField = {
   name: 'contact',
   type: 'group',

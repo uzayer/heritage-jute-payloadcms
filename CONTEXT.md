@@ -30,7 +30,7 @@ An image or downloadable file managed in Payload and reusable by Products, Site 
 _Avoid_: Static image, public asset
 
 **Inquiry**:
-A contact-form submission sent to Heritage Jute through Web3Forms; it is not a CMS record in the initial migration.
+A contact-form submission sent to Heritage Jute through Resend; it is not a CMS record in the initial migration.
 _Avoid_: Lead, form entry
 
 **Post**:
